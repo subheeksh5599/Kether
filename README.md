@@ -187,7 +187,7 @@ Kether uses x402 as its monetization rail. Agent builders pay per analytics quer
 
 | Capability | Status |
 |---|---|
-| **Research** — competitive analysis, winning pattern identified (Flovia, Colosseum Frontier Top 25) | **Done** |
+| **Research** — competitive analysis | **Done** |
 | **Architecture** — component design, data flow, x402 integration plan | **Done** |
 | **GOAT Network Wallet** — `0xf9BAC173da2E212Bb2A8418178714c4dB0e867e0` | **Done** |
 | **GOAT x402 Integration Faucet** — requested | **Pending** |
