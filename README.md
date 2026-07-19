@@ -191,13 +191,14 @@ Kether uses x402 as its monetization rail. Agent builders pay per analytics quer
 | **Architecture** — component design, data flow, x402 integration plan | **Done** |
 | **GOAT Network Wallet** — `0xf9BAC173da2E212Bb2A8418178714c4dB0e867e0` | **Done** |
 | **GOAT x402 Integration Faucet** — requested | **Pending** |
-| **Contract — KetherIndexer.sol** (on-chain aggregations) | **Roadmap** |
-| **Indexer** — x402 event polling, ERC-8004 linking, SQLite storage | **Roadmap** |
-| **API** — FastAPI endpoints, x402 gating | **Roadmap** |
-| **Prediction Engine** — time-series regression on payment data | **Roadmap** |
-| **Dashboard** — React + Recharts revenue intelligence | **Roadmap** |
-| **Live deployment** — kether.vercel.app | **Roadmap** |
-| **Real x402 payments** — production settlement on GOAT Network | **Roadmap** |
+| **KetherIndexer.sol** (on-chain x402 payment aggregation) | **Done** — 8 forge tests passing, compiled, ready for deploy |
+| **Indexer** — x402 event polling, ERC-8004 linking, SQLite storage | **Done** — TypeScript poller, WAL-mode SQLite, 10s interval |
+| **API** — FastAPI endpoints (/agent/:id, /services, /clients, /predict) | **Done** — 5 endpoints, x402-gated /predict, CORS enabled |
+| **Prediction Engine** — linear regression on payment time-series | **Done** — scikit-learn, R² confidence scoring |
+| **Dashboard** — React + Recharts revenue intelligence | **Done** — KPI cards, bar/pie charts, client table, prediction panel |
+| **GOAT Testnet3 Contract Deploy** — KetherIndexer on-chain | **Pending** — compiled, needs testnet BTC from faucet (bridge.testnet3.goat.network/faucet) |
+| **Live deployment** — kether.vercel.app | **Pending** — dashboard ready for Vercel deploy |
+| **Real x402 payments** — production settlement on GOAT Network | **Pending** — testnet first, mainnet post-grant |
 
 ---
 
