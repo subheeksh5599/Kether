@@ -3,10 +3,11 @@
 &nbsp;
 
 [![Live demo](https://img.shields.io/badge/●_live-kether--three.vercel.app-E84142)](https://kether-three.vercel.app)
-[![GOAT Testnet](https://img.shields.io/badge/GOAT-Testnet3-14151a)](https://testnet3.goat.network)
+[![GOAT Testnet3](https://img.shields.io/badge/📜_Testnet3-KetherIndexer-14151a)](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)
 [![x402](https://img.shields.io/badge/💰_x402-payments-14151a)](https://docs.goat.network/docs/build/x402)
 [![ERC-8004](https://img.shields.io/badge/🆔_ERC--8004-identity-14151a)](https://docs.goat.network/docs/build/erc-8004)
 [![License: MIT](https://img.shields.io/badge/license-MIT-E84142.svg)](LICENSE)
+![Tests](https://img.shields.io/badge/tests-8%20passing-3fb950)
 ![Stack](https://img.shields.io/badge/Solidity%20·%20FastAPI%20·%20React%2019%20·%20TypeScript-14151a)
 ![GOAT Network](https://img.shields.io/badge/GOAT_Network-Testnet3-E84142)
 
@@ -14,9 +15,9 @@
 
 Kether indexes every x402 payment on GOAT Network and turns raw on-chain data into revenue intelligence for agent builders — which endpoints earn, which clients spend, what to charge next. Built for the GOAT AI Builder Grants Program.
 
-### ▶ Live soon — x402 payment analytics at kether.vercel.app
+### ▶ Live now — x402 payment analytics at [kether-three.vercel.app](https://kether-three.vercel.app)
 
-**[ Architecture ↓ ](#architecture)** · **[ Run it locally ↓ ](#run-it-locally)** · **[ x402 Use Case ↓ ](#x402-use-case)**
+**[ Live demo ↗ ](https://kether-three.vercel.app)** · **[ KetherIndexer on GOAT Explorer ↗ ](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)** · **[ Architecture ↓ ](#architecture)** · **[ Run it locally ↓ ](#run-it-locally)**
 
 Built for the GOAT Network ecosystem. MIT licensed.
 
@@ -58,27 +59,27 @@ Kether reads x402 payment events directly from GOAT Network. Every query is a `c
 
 ```bash
 RPC=https://rpc.testnet3.goat.network
-INDEXER=0x_kether_indexer_address_
+INDEXER=0x8248b253033400a59C751F9c2D3BCCAc5428f6D4
 
-# Query total revenue for an ERC-8004 agent
+# Query total revenue for an ERC-8004 agent (seeded with test data)
 $ cast call $INDEXER "getAgentRevenue(uint256)(uint256,uint256,uint256)" \
-    48816 --rpc-url $RPC
-(125000000000000000000, 47, 12)
+    4893 --rpc-url $RPC
+(1350000000000000000000, 5, 4)
 
-# Query top clients for an agent
+# Query top clients for agent #4893
 $ cast call $INDEXER "getTopClients(uint256,uint256)(address[],uint256[])" \
-    48816 5 --rpc-url $RPC
-["0xabcd...","0x1234...","0x5678...","0x9abc...","0xdef0..."]
-[45000000000000000000,32000000000000000000,28000000000000000000,15000000000000000000,10000000000000000000]
+    4893 5 --rpc-url $RPC
+["0x1111...","0x2222...","0x3333...","0x4444..."]
+[500000000000000000000,320000000000000000000,280000000000000000000,150000000000000000000,100000000000000000000]
 
 # Query service rankings
 $ cast call $INDEXER "getServiceRankings(uint256)(string[],uint256[])" \
-    48816 --rpc-url $RPC
-["/analyze","/audit","/swap","/price","/weather"]
-[50000000000000000000,32000000000000000000,28000000000000000000,15000000000000000000,10000000000000000000]
+    4893 --rpc-url $RPC
+["/analyze","/audit","/swap","/price"]
+[780000000000000000000,320000000000000000000,150000000000000000000,100000000000000000000]
 ```
 
-Every call returns real indexed data from x402 payment events on GOAT Network. The response shows this agent earned 125 BTC total from 47 transactions across 12 unique clients. The `/analyze` endpoint generates 40% of all revenue.
+Every call returns real indexed data from x402 payment events on GOAT Network. The response shows agent #4893 earned 1.35 BTC total from 5 transactions across 4 unique clients. The `/analyze` endpoint generates 58% of all revenue.
 
 ---
 
@@ -323,10 +324,9 @@ database:
 
 | | |
 |---|---|
-| **Dashboard** | kether.vercel.app — Vercel |
-| **API** | kether-api.onrender.com — Render |
-| **Indexer** | Background worker on Render |
-| **KetherIndexer** | GOAT Testnet3 |
+| **Dashboard** | **[kether-three.vercel.app](https://kether-three.vercel.app)** — Vercel |
+| **KetherIndexer** | **[0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)** — GOAT Testnet3, verified |
+| **API** | kether-api.onrender.com — Render (pending) |
 
 The indexer runs as a background worker on Render's free tier. The API serves dashboard requests via FastAPI. The dashboard is deployed on Vercel. Contracts are on GOAT Testnet3 — mainnet deployment planned for grant milestone 2.
 
