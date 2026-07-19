@@ -2,7 +2,7 @@
 
 &nbsp;
 
-[![Live demo](https://img.shields.io/badge/●_live-coming_soon-E84142)]()
+[![Live demo](https://img.shields.io/badge/●_live-kether--three.vercel.app-E84142)](https://kether-three.vercel.app)
 [![GOAT Testnet](https://img.shields.io/badge/GOAT-Testnet3-14151a)](https://testnet3.goat.network)
 [![x402](https://img.shields.io/badge/💰_x402-payments-14151a)](https://docs.goat.network/docs/build/x402)
 [![ERC-8004](https://img.shields.io/badge/🆔_ERC--8004-identity-14151a)](https://docs.goat.network/docs/build/erc-8004)
@@ -197,7 +197,7 @@ Kether uses x402 as its monetization rail. Agent builders pay per analytics quer
 | **Prediction Engine** — linear regression on payment time-series | **Done** — scikit-learn, R² confidence scoring |
 | **Dashboard** — React + Recharts revenue intelligence | **Done** — KPI cards, bar/pie charts, client table, prediction panel |
 | **GOAT Testnet3 Contract Deploy** — KetherIndexer on-chain | **Pending** — compiled, needs testnet BTC from faucet (bridge.testnet3.goat.network/faucet) |
-| **Live deployment** — kether.vercel.app | **Pending** — dashboard ready for Vercel deploy |
+| **Live deployment** — kether-three.vercel.app | **Live** — dashboard deployed, interactive |
 | **Real x402 payments** — production settlement on GOAT Network | **Pending** — testnet first, mainnet post-grant |
 
 ---
