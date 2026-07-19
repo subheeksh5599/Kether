@@ -196,7 +196,7 @@ Kether uses x402 as its monetization rail. Agent builders pay per analytics quer
 | **API** — FastAPI endpoints (/agent/:id, /services, /clients, /predict) | **Done** — 5 endpoints, x402-gated /predict, CORS enabled |
 | **Prediction Engine** — linear regression on payment time-series | **Done** — scikit-learn, R² confidence scoring |
 | **Dashboard** — React + Recharts revenue intelligence | **Done** — KPI cards, bar/pie charts, client table, prediction panel |
-| **GOAT Testnet3 Contract Deploy** — KetherIndexer on-chain | **Pending** — compiled, needs testnet BTC from faucet (bridge.testnet3.goat.network/faucet) |
+| **GOAT Testnet3 Contract Deploy** — KetherIndexer on-chain | **Live** — [0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4), verified, seeded with test data |
 | **Live deployment** — kether-three.vercel.app | **Live** — dashboard deployed, interactive |
 | **Real x402 payments** — production settlement on GOAT Network | **Pending** — testnet first, mainnet post-grant |
 
