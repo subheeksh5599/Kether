@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+.env
+data/kether.db
+__pycache__/
+*.pyc
+contracts/lib/
+contracts/cache/
+contracts/out/
+contracts/broadcast/
