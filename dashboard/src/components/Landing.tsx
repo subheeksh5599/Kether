@@ -216,7 +216,7 @@ export default function Landing() {
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
             <div>
               <div className="upper" style={{ marginBottom: "0.3rem" }}>Phase 1: GOAT Testnet3 Chain Analytics · Phase 2: x402 Payments</div>
-              <h2 className="pixel" style={{ fontSize: "clamp(2rem,5vw,4.5rem)" }}>PROJECTS</h2>
+              <h2 className="pixel" style={{ fontSize: "clamp(2rem,5vw,4.5rem)" }}>FEATURES</h2>
             </div>
             <div className="tag">PHASE 1 · LIVE</div>
           </div>
