@@ -1,39 +1,21 @@
-"""
-Kether API — GOAT Network chain analytics.
-
-Phase 1 (now): real-time chain metrics — blocks, transactions, gas, active addresses.
-Phase 2 (future): x402 payment analytics when agent ecosystem matures.
-
-Endpoints:
-  GET  /chain/stats        — total blocks, txns, addresses, gas
-  GET  /chain/blocks       — recent blocks
-  GET  /chain/transactions — recent transactions
-  GET  /health             — liveness check
-"""
-
+"""Kether API — reads chain data from JSON state file produced by indexer."""
+import json, os
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from engine.store import get_db
+
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
+STATE_PATH = os.path.join(DATA_DIR, "chain.json")
 
 app = FastAPI(title="Kether API", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# ── Models ────────────────────────────────────────
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 class ChainStats(BaseModel):
-    total_blocks: int
-    total_txns: int
-    total_addresses: int
-    total_gas: str
-    last_block: int
+    total_blocks: int = 0
+    total_txns: int = 0
+    total_addresses: int = 0
+    total_gas: str = "0"
+    last_block: int = 0
     chain_id: int = 48816
     network: str = "GOAT Testnet3"
 
@@ -57,58 +39,34 @@ class TxnRow(BaseModel):
 class TxnsResponse(BaseModel):
     transactions: list[TxnRow]
 
-
-# ── Routes ────────────────────────────────────────
+def load_state():
+    if not os.path.exists(STATE_PATH):
+        return {}
+    with open(STATE_PATH) as f:
+        return json.load(f)
 
 @app.get("/health")
 async def health():
     return {"status": "ok", "network": "GOAT Testnet3", "chain_id": 48816}
 
-
 @app.get("/chain/stats", response_model=ChainStats)
 async def chain_stats():
-    db = get_db()
-    row = db.execute("SELECT * FROM chain_stats WHERE id = 1").fetchone()
-    if not row:
-        return ChainStats(total_blocks=0, total_txns=0, total_addresses=0, total_gas="0", last_block=0)
+    s = load_state()
     return ChainStats(
-        total_blocks=row["total_blocks"],
-        total_txns=row["total_txns"],
-        total_addresses=row["total_addresses"],
-        total_gas=row["total_gas"],
-        last_block=row["last_block"],
+        total_blocks=s.get("total_blocks", 0),
+        total_txns=s.get("total_txns", 0),
+        total_addresses=s.get("total_addresses", 0),
+        last_block=s.get("last_block", 0),
     )
-
 
 @app.get("/chain/blocks", response_model=BlocksResponse)
 async def chain_blocks(limit: int = Query(default=20, le=100)):
-    db = get_db()
-    rows = db.execute(
-        "SELECT number, hash, timestamp, tx_count FROM blocks ORDER BY number DESC LIMIT ?",
-        (limit,),
-    ).fetchall()
-    return BlocksResponse(
-        blocks=[BlockRow(number=r["number"], hash=r["hash"], timestamp=r["timestamp"], tx_count=r["tx_count"]) for r in rows]
-    )
-
+    s = load_state()
+    blocks = s.get("recent_blocks", [])[:limit]
+    return BlocksResponse(blocks=[BlockRow(**b) for b in blocks])
 
 @app.get("/chain/transactions", response_model=TxnsResponse)
 async def chain_transactions(limit: int = Query(default=20, le=100)):
-    db = get_db()
-    rows = db.execute(
-        "SELECT hash, block_number, from_addr, to_addr, value, timestamp FROM transactions ORDER BY timestamp DESC LIMIT ?",
-        (limit,),
-    ).fetchall()
-    return TxnsResponse(
-        transactions=[
-            TxnRow(
-                hash=r["hash"],
-                block_number=r["block_number"],
-                from_addr=r["from_addr"],
-                to_addr=r["to_addr"],
-                value=r["value"],
-                timestamp=r["timestamp"],
-            )
-            for r in rows
-        ]
-    )
+    s = load_state()
+    txns = s.get("recent_txns", [])[:limit]
+    return TxnsResponse(transactions=[TxnRow(**t) for t in txns])

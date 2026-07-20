@@ -3,50 +3,50 @@ import { Link } from "react-router-dom";
 
 const PROJECTS = [
   {
-    id: "kether", category: "analytics", tag: "GOAT Grant", logo: "K",
-    name: "Kether",
-    desc: "x402 payment analytics for AI agents on GOAT Network. Indexes every PaymentSettled event, links ERC-8004 identities, and delivers revenue intelligence dashboards. Built for GOAT AI Builder Grants ($500 base grant).",
-    stats: [["Chain", "GOAT Network"], ["Contract", "Testnet3 Verified"], ["Tests", "8 passing"], ["Stack", "Solidity+FastAPI+React"]],
+    id: "blocks", category: "analytics", tag: "Phase 1", logo: "B",
+    name: "Block Indexing",
+    desc: "Polls GOAT Testnet3 every 10 seconds. Indexes every block — number, hash, timestamp, transaction count. Real data, no mockups. The foundation everything else is built on.",
+    stats: [["Runtime", "TypeScript + tsx"], ["RPC", "GOAT Testnet3"], ["Poll", "10 seconds"]],
     website: "https://kether-three.vercel.app", twitter: "https://github.com/subheeksh5599/kether",
   },
   {
-    id: "payrollx", category: "defi", tag: "Xphere Grant", logo: "PX",
-    name: "PayrollX",
-    desc: "Stablecoin payroll for Southeast Asian remote teams. Employers deposit USDC into an escrow contract. Workers receive funds directly to wallets — no bank account needed. Built on Xphere EVM.",
-    stats: [["Chain", "Xphere EVM"], ["Stack", "Solidity+FastAPI+React"], ["Status", "Idea → Building"]],
-    website: "https://github.com/subheeksh5599/payrollx", twitter: "https://github.com/subheeksh5599/payrollx",
+    id: "txns", category: "analytics", tag: "Phase 1", logo: "T",
+    name: "Transaction Feed",
+    desc: "Every transaction from every indexed block — sender, receiver, value, timestamp. Live feed with links to GOAT Explorer for on-chain verification.",
+    stats: [["Storage", "JSON state file"], ["Links", "GOAT Explorer"], ["Feed", "Last 200 txns"]],
+    website: "https://kether-three.vercel.app", twitter: "https://github.com/subheeksh5599/kether",
   },
   {
-    id: "fabricx", category: "defi", tag: "OKX Live", logo: "FX",
-    name: "FabricX",
-    desc: "x402 payment-gated API agent on OKX. Agent #4893 — live, reviewer-tested. Accepts payments via x402 protocol with ERC-8004 identity verification. Production agent with real transaction volume.",
-    stats: [["Chain", "X Layer (OKX)"], ["Agent ID", "#4893"], ["Status", "Live"], ["Stack", "x402+ERC-8004"]],
-    website: "https://github.com/subheeksh5599/FabricX", twitter: "https://github.com/subheeksh5599/FabricX",
+    id: "addresses", category: "analytics", tag: "Phase 1", logo: "A",
+    name: "Address Tracking",
+    desc: "Tracks every unique address that interacts with GOAT Testnet3. First seen, last seen, transaction count. Proof of real chain activity and user growth.",
+    stats: [["Tracking", "Unique addresses"], ["Metrics", "First seen, last seen, count"], ["Update", "Every block"]],
+    website: "https://kether-three.vercel.app", twitter: "https://github.com/subheeksh5599/kether",
   },
   {
-    id: "nox", category: "privacy", tag: "Midnight", logo: "N",
-    name: "Nox",
-    desc: "Privacy-preserving credential verification on Midnight Network. Zero-knowledge proofs for enterprise identity — verify credentials without revealing underlying data. Deployed on Midnight testnet.",
-    stats: [["Chain", "Midnight Compact 0.5.1"], ["Type", "ZK Credentials"], ["Deploy", "nox-smoky.vercel.app"]],
-    website: "https://nox-smoky.vercel.app", twitter: "https://github.com/subheeksh5599/nox",
+    id: "dashboard", category: "analytics", tag: "Phase 1", logo: "D",
+    name: "Live Dashboard",
+    desc: "Real-time chain metrics in a brutalist industrial UI. Block count, transaction count, active addresses, gas usage — all from real GOAT Testnet3 data. No fake numbers.",
+    stats: [["Frontend", "React 19 + Vite 6"], ["Design", "Tailwind CSS v4"], ["Polling", "10s to API"]],
+    website: "https://kether-three.vercel.app", twitter: "https://github.com/subheeksh5599/kether",
   },
   {
-    id: "robinhood", category: "defi", tag: "Policy Layer", logo: "RH",
-    name: "Robinhood Chain",
-    desc: "On-chain policy layer for AI agents. Agents can't move funds without passing programmable guardrails. Rate limiting, allowlists, spending caps — enforced at the chain level. Built for the Robinhood Ecosystem Fund.",
-    stats: [["Chain", "Robinhood Chain"], ["Type", "Agent Policy Layer"], ["Standard", "x402+USDG"]],
-    website: "https://github.com/subheeksh5599/robinhood-chain", twitter: "https://github.com/subheeksh5599/robinhood-chain",
+    id: "contract", category: "infra", tag: "Deployed", logo: "C",
+    name: "KetherIndexer Contract",
+    desc: "Solidity contract deployed and verified on GOAT Testnet3. 8 forge tests passing. On-chain aggregations for future x402 payment indexing in Phase 2.",
+    stats: [["Language", "Solidity 0.8.24"], ["Framework", "Foundry (forge)"], ["Tests", "8 passing"]],
+    website: "https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4", twitter: "https://github.com/subheeksh5599/kether",
   },
   {
-    id: "night", category: "privacy", tag: "Midnight", logo: "NS",
-    name: "NightSignals",
-    desc: "On-chain trading signals with ZK privacy. Creators publish signals that buyers can verify without revealing strategy details. Signal validity proven via Midnight ZK circuits.",
-    stats: [["Chain", "Midnight"], ["Type", "ZK Trading Signals"], ["Status", "Contract Deployed"]],
-    website: "https://github.com/subheeksh5599/nightsignals", twitter: "https://github.com/subheeksh5599/nightsignals",
+    id: "phase2", category: "infra", tag: "Planned", logo: "2",
+    name: "x402 Payment Analytics",
+    desc: "Phase 2 roadmap: index x402 payments on GOAT Network when the agent ecosystem launches. Per-agent revenue dashboards, client breakdowns, growth prediction. Same indexer, new event filter.",
+    stats: [["API", "FastAPI (Python)"], ["Stack", "x402 + ERC-8004"], ["ETA", "Post-grant"]],
+    website: "https://kether-three.vercel.app", twitter: "https://github.com/subheeksh5599/kether",
   },
 ];
 
-const FILTERS = ["All", "Analytics", "DeFi", "Privacy"];
+const FILTERS = ["All", "Analytics", "Infrastructure"];
 
 export default function Landing() {
   const [filter, setFilter] = useState("All");
