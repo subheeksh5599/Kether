@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kether — x402 Payment Analytics for AI Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   KETHER LANDING — Industrial Techno / ChainGPT Labs Vibe
+   ============================================================ */
+
+:root {
+  --bg: #f1f1f1;
+  --text: #111111;
+  --accent: #ff5a00;
+  --border: rgba(0,0,0,0.12);
+  --surface: #ffffff;
+  --muted: #999999;
+  --card-bg: #fafafa;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-behavior:auto;font-size:16px;-webkit-font-smoothing:antialiased}
+html.lenis{height:auto}.lenis.lenis-smooth{scroll-behavior:auto}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-scrolling iframe{pointer-events:none}
+
+body{
+  font-family:'Space Mono',monospace;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── Film Grain ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.6;mix-blend-mode:multiply;
+}
+
+/* ── Typography ── */
+.pixel{font-family:'DotGothic16',monospace;font-weight:400;letter-spacing:-0.02em;line-height:0.9}
+.mono{font-family:'Space Mono',monospace}
+.upper{text-transform:uppercase;letter-spacing:0.12em;font-size:0.675rem;color:var(--muted)}
+.accent{color:var(--accent)}
+
+h1.pixel{font-size:clamp(3rem,8vw,8rem)}
+h2.pixel{font-size:clamp(2rem,5vw,4.5rem)}
+h3.pixel{font-size:clamp(1.4rem,3vw,2.5rem)}
+
+/* ── Hairline borders ── */
+.border-thin{border:1px solid var(--border)}
+.border-top{border-top:1px solid var(--border)}
+.border-bottom{border-bottom:1px solid var(--border)}
+.border-left{border-left:1px solid var(--border)}
+.border-right{border-right:1px solid var(--border)}
+
+/* ── Layout ── */
+.wrap{max-width:1400px;margin:0 auto;padding:0 2rem}
+.section{padding:6rem 0;position:relative}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Space Mono',monospace;font-size:0.75rem;
+  text-transform:uppercase;letter-spacing:0.1em;
+  padding:0.75rem 1.5rem;cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
+  text-decoration:none;white-space:nowrap;
+}
+.btn-solid{
+  background:var(--accent);color:#fff;border:1px solid var(--accent);
+}
+.btn-solid:hover{background:#e04d00;border-color:#e04d00;transform:translateY(-1px);box-shadow:0 4px 24px rgba(255,90,0,0.3)}
+.btn-ghost{
+  background:transparent;color:var(--text);border:1px solid var(--text);
+}
+.btn-ghost:hover{background:var(--text);color:var(--bg);transform:translateY(-1px)}
+.btn-sm{padding:0.5rem 1rem;font-size:0.65rem}
+
+/* ── Tag ── */
+.tag{
+  display:inline-block;
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  text-transform:uppercase;letter-spacing:0.1em;
+  padding:0.2rem 0.6rem;
+  border:1px solid var(--accent);color:var(--accent);
+  background:rgba(255,90,0,0.05);
+}
+
+/* ═══════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(241,241,241,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:1rem 0;
+  transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+nav.hidden{transform:translateY(-100%)}
+.nav-inner{
+  max-width:1400px;margin:0 auto;padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1.5rem;
+}
+.nav-logo{font-family:'DotGothic16',monospace;font-size:1.4rem;color:var(--text);text-decoration:none;white-space:nowrap}
+.nav-logo span{color:var(--accent)}
+.nav-center{display:flex;gap:1.75rem;align-items:center}
+.nav-center a{
+  font-family:'Space Mono',monospace;font-size:0.7rem;
+  text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--muted);text-decoration:none;transition:color 0.2s;
+}
+.nav-center a:hover{color:var(--text)}
+.nav-right{display:flex;gap:0.75rem;align-items:center}
+.mobile-toggle{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer}
+
+/* ═══════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════ */
+.hero{
+  min-height:100vh;display:flex;align-items:center;position:relative;
+  padding-top:4rem;overflow:hidden;
+}
+.hero-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+  width:100%;align-items:center;
+}
+.hero-left{position:relative;z-index:2}
+.glitch-word{display:inline-block}
+.hero-stats{margin-top:2.5rem;display:flex;gap:1.5rem;flex-wrap:wrap}
+.stat-tile{
+  border:1px solid var(--border);background:var(--surface);
+  padding:1rem 1.25rem;min-width:140px;
+}
+.stat-tile .upper{font-size:0.55rem;margin-bottom:0.25rem}
+.stat-tile .stat-val{font-family:'DotGothic16',monospace;font-size:1.6rem;color:var(--accent);line-height:1}
+.hero-right{position:relative;height:500px;z-index:1}
+#node-canvas{width:100%;height:100%;display:block}
+.hero-scroll-hint{
+  position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);
+  font-size:0.55rem;text-transform:uppercase;letter-spacing:0.15em;
+  color:var(--muted);animation:bob 2s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* ═══════════════════════════════════════════════
+   FILTER BAR
+   ═══════════════════════════════════════════════ */
+.filter-bar{
+  display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;
+  margin-bottom:2.5rem;
+}
+.filter-tab{
+  font-family:'Space Mono',monospace;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:0.08em;
+  padding:0.5rem 1rem;cursor:pointer;
+  border:1px solid transparent;background:transparent;
+  color:var(--muted);transition:all 0.2s;
+}
+.filter-tab:hover{color:var(--text)}
+.filter-tab.active{
+  color:var(--accent);border-color:var(--accent);
+  background:rgba(255,90,0,0.05);
+}
+.filter-search{
+  margin-left:auto;
+  font-family:'Space Mono',monospace;font-size:0.65rem;
+  text-transform:uppercase;letter-spacing:0.08em;
+  padding:0.5rem 1rem;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);outline:none;
+  width:200px;transition:border-color 0.2s;
+}
+.filter-search:focus{border-color:var(--accent)}
+.filter-search::placeholder{color:var(--muted)}
+
+/* ═══════════════════════════════════════════════
+   PORTOFOLIO BENTO GRID
+   ═══════════════════════════════════════════════ */
+.portfolio-section{position:relative}
+.bento-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  border:1px solid var(--border);
+}
+.bento-card{
+  background:var(--card-bg);padding:1.75rem;
+  position:relative;cursor:pointer;
+  transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;
+  min-height:260px;
+}
+.bento-card::before{
+  content:'';position:absolute;inset:-1px;
+  border:1px solid var(--accent);opacity:0;
+  transition:opacity 0.4s;
+  pointer-events:none;z-index:1;
+}
+.bento-card:hover::before{opacity:1}
+.bento-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.06)}
+.bento-card.featured{grid-column:span 2}
+.card-tag{
+  position:absolute;top:0.75rem;right:0.75rem;
+  font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--muted);border:1px solid var(--border);
+  padding:0.15rem 0.5rem;background:var(--surface);
+}
+.card-logo{
+  width:40px;height:40px;margin-bottom:1rem;
+  border:1px solid var(--border);display:flex;
+  align-items:center;justify-content:center;
+  font-family:'DotGothic16',monospace;font-size:0.85rem;
+  color:var(--accent);background:var(--surface);
+}
+.card-name{font-family:'DotGothic16',monospace;font-size:1.2rem;margin-bottom:0.35rem}
+.card-desc{font-size:0.65rem;color:var(--muted);margin-bottom:1rem;flex:1}
+.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem}
+.card-stat{font-size:0.55rem;text-transform:uppercase;letter-spacing:0.06em}
+.card-stat span{display:block;font-family:'DotGothic16',monospace;font-size:1rem;color:var(--accent);margin-top:0.15rem}
+.card-arrow{
+  display:flex;align-items:center;gap:0.4rem;
+  font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--accent);transition:gap 0.2s;
+}
+.card-arrow:hover{gap:0.7rem}
+
+/* ═══════════════════════════════════════════════
+   Project Detail Panel
+   ═══════════════════════════════════════════════ */
+.detail-overlay{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(17,17,17,0.85);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem;opacity:0;pointer-events:none;
+  transition:opacity 0.4s;
+}
+.detail-overlay.open{opacity:1;pointer-events:auto}
+.detail-panel{
+  background:var(--bg);border:1px solid var(--border);
+  max-width:800px;width:100%;max-height:90vh;overflow-y:auto;
+  padding:2.5rem;position:relative;
+}
+.detail-close{
+  position:absolute;top:1rem;right:1.25rem;
+  background:none;border:1px solid var(--border);
+  color:var(--text);font-size:1.2rem;cursor:pointer;
+  width:36px;height:36px;display:flex;align-items:center;
+  justify-content:center;transition:all 0.2s;
+}
+.detail-close:hover{background:var(--text);color:var(--bg)}
+.detail-name{font-family:'DotGothic16',monospace;font-size:2.8rem;margin-bottom:0.5rem;line-height:1}
+.detail-desc{font-size:0.75rem;color:var(--muted);margin-bottom:1.5rem;max-width:500px}
+.detail-links{display:flex;gap:0.75rem;margin-bottom:2rem}
+.detail-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-bottom:2rem}
+.detail-meta-item{
+  border:1px solid var(--border);padding:1rem;
+  background:var(--surface);
+}
+.detail-meta-item .upper{margin-bottom:0.3rem}
+.detail-meta-item div{font-family:'DotGothic16',monospace;font-size:1.1rem}
+.detail-timeline{
+  display:flex;gap:0;align-items:center;margin-bottom:2rem;
+  border:1px solid var(--border);padding:1.5rem;background:var(--surface);
+}
+.timeline-point{flex:1;text-align:center}
+.timeline-point .upper{font-size:0.5rem}
+.timeline-point .val{font-family:'DotGothic16',monospace;font-size:0.9rem;color:var(--accent);margin-top:0.2rem}
+.timeline-arrow{font-size:1.2rem;color:var(--accent);padding:0 0.5rem}
+
+/* Chrome block */
+.chrome-block{
+  border:1px solid var(--border);padding:2rem;
+  background:
+    linear-gradient(135deg,rgba(255,90,0,0.08) 0%,transparent 50%),
+    linear-gradient(225deg,rgba(255,90,0,0.04) 0%,transparent 50%),
+    var(--surface);
+  position:relative;overflow:hidden;
+}
+.chrome-block::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(255,90,0,0.15),transparent 70%);
+  pointer-events:none;
+}
+.chrome-block .upper{position:relative;z-index:1}
+.chrome-block .stat-val{font-family:'DotGothic16',monospace;font-size:2rem;color:var(--accent);position:relative;z-index:1}
+
+/* ═══════════════════════════════════════════════
+   CTA
+   ═══════════════════════════════════════════════ */
+.cta-section{
+  text-align:center;padding:8rem 0;
+  border-top:1px solid var(--border);
+}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-right{height:300px}
+  .bento-grid{grid-template-columns:1fr 1fr}
+  .bento-card.featured{grid-column:span 1}
+}
+@media(max-width:600px){
+  .bento-grid{grid-template-columns:1fr}
+  .nav-center{display:none}
+  .nav-right .btn-ghost{display:none}
+  .wrap{padding:0 1rem}
+  h1.pixel{font-size:3rem}
+  .filter-search{width:100%;margin-left:0}
+  .detail-name{font-size:2rem}
+  .detail-meta{grid-template-columns:1fr}
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* ── Selection ── */
+::selection{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">KETH<span>ER</span></a>
+    <div class="nav-center">
+      <a href="#products">Products</a>
+      <a href="#ecosystem">Ecosystem</a>
+      <a href="#docs">Docs</a>
+      <a href="#blog">Blog</a>
+    </div>
+    <div class="nav-right">
+      <a href="https://kether-three.vercel.app" class="btn btn-ghost btn-sm">Open Dashboard</a>
+      <a href="https://github.com/subheeksh5599/kether" class="btn btn-solid btn-sm">GITHUB</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero section" id="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-left" data-anim="hero-left">
+        <div class="upper" style="margin-bottom:0.5rem">x402 Payment Analytics · GOAT Network</div>
+        <h1 class="pixel" data-glitch="true">
+          <span class="glitch-word" data-text="AGENTS">AGENTS</span>
+          <span class="glitch-word" data-text="PAY._WE">PAY. WE</span>
+          <span class="glitch-word" data-text="INDEX.">INDEX.</span>
+        </h1>
+        <p style="font-size:0.75rem;color:var(--muted);max-width:400px;margin-top:1.5rem">
+          Every x402 payment on GOAT Network, indexed and analyzed. Revenue intelligence, client breakdowns, and growth prediction for AI agent builders.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-tile" data-stat="payments">
+            <div class="upper">Payments Indexed</div>
+            <div class="stat-val" data-count="12470" data-suffix="+">0</div>
+          </div>
+          <div class="stat-tile" data-stat="agents">
+            <div class="upper">Agents Tracked</div>
+            <div class="stat-val" data-count="847">000</div>
+          </div>
+          <div class="stat-tile" data-stat="endpoints">
+            <div class="upper">Endpoints Monitored</div>
+            <div class="stat-val" data-count="3102" data-suffix="+">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <canvas id="node-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">↓ Scroll to explore</div>
+</section>
+
+<!-- ═══════════════ PRODUCTS ═══════════════ -->
+<section class="section portfolio-section" id="products">
+  <div class="wrap">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div class="upper" style="margin-bottom:0.3rem">Products & Ecosystem</div>
+        <h2 class="pixel" data-glitch="true">
+          <span class="glitch-word" data-text="WHAT_WE">WHAT WE</span>
+          <span class="glitch-word" data-text="BUILD">BUILD</span>
+        </h2>
+      </div>
+      <div class="tag">LIVE ON TESTNET</div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="analytics">Analytics</button>
+      <button class="filter-tab" data-filter="identity">Identity</button>
+      <button class="filter-tab" data-filter="privacy">Privacy</button>
+      <input type="text" class="filter-search" placeholder="Search products...">
+    </div>
+
+    <div class="bento-grid" id="bentoGrid">
+      <!-- Card 1: Featured — Kether -->
+      <div class="bento-card featured" data-category="analytics" data-project="kether">
+        <span class="card-tag">Core Product</span>
+        <div class="card-logo">K</div>
+        <div class="card-name">Kether Protocol</div>
+        <div class="card-desc">x402 payment analytics for AI agents on GOAT Network. Indexes every PaymentSettled event, links ERC-8004 identities, and delivers revenue intelligence dashboards for agent builders.</div>
+        <div class="card-stats">
+          <div class="card-stat">Chain<span>GOAT Network</span></div>
+          <div class="card-stat">Contract<span>Testnet3</span></div>
+          <div class="card-stat">Forge Tests<span>8 passing</span></div>
+          <div class="card-stat">Stack<span>Solidity+FastAPI+React</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 2: Revenue Intelligence -->
+      <div class="bento-card" data-category="analytics" data-project="revenue">
+        <span class="card-tag">Analytics</span>
+        <div class="card-logo">$</div>
+        <div class="card-name">Revenue Intel</div>
+        <div class="card-desc">Total earned, monthly trend, per-service breakdown. Know exactly which endpoints generate revenue and how it grows over time.</div>
+        <div class="card-stats">
+          <div class="card-stat">Data<span>On-chain x402</span></div>
+          <div class="card-stat">Update<span>10s polling</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 3: Client Breakdown -->
+      <div class="bento-card" data-category="analytics" data-project="clients">
+        <span class="card-tag">Analytics</span>
+        <div class="card-logo">C</div>
+        <div class="card-name">Client Intel</div>
+        <div class="card-desc">Discover which clients drive 80% of revenue. Per-client spending, service usage, payment frequency, and last active — all from on-chain data.</div>
+        <div class="card-stats">
+          <div class="card-stat">Source<span>x402 payer events</span></div>
+          <div class="card-stat">Output<span>Ranked client list</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 4: Growth Prediction -->
+      <div class="bento-card" data-category="analytics" data-project="predict">
+        <span class="card-tag">Analytics</span>
+        <div class="card-logo">↗</div>
+        <div class="card-name">Growth Predict</div>
+        <div class="card-desc">Linear regression on your on-chain payment history. Forecast next-month revenue with confidence intervals. x402-gated — pay per prediction query.</div>
+        <div class="card-stats">
+          <div class="card-stat">Model<span>Linear regression</span></div>
+          <div class="card-stat">Access<span>x402-gated</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 5: ERC-8004 Identity -->
+      <div class="bento-card" data-category="identity" data-project="identity">
+        <span class="card-tag">Identity</span>
+        <div class="card-logo">ID</div>
+        <div class="card-name">ERC-8004 Link</div>
+        <div class="card-desc">Every payment linked to a verifiable agent identity on GOAT Network. No impersonation. Every analytics page is provably tied to an on-chain agent profile.</div>
+        <div class="card-stats">
+          <div class="card-stat">Standard<span>ERC-8004</span></div>
+          <div class="card-stat">Registry<span>On-chain</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 6: Nox — Privacy -->
+      <div class="bento-card" data-category="privacy" data-project="nox">
+        <span class="card-tag">Ecosystem</span>
+        <div class="card-logo">N</div>
+        <div class="card-name">Nox</div>
+        <div class="card-desc">Privacy-preserving credential verification on Midnight Network. Zero-knowledge proofs for enterprise identity — verify without revealing.</div>
+        <div class="card-stats">
+          <div class="card-stat">Chain<span>Midnight</span></div>
+          <div class="card-stat">Type<span>ZK Credentials</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+
+      <!-- Card 7: x402 Gateway -->
+      <div class="bento-card" data-category="analytics" data-project="x402gate">
+        <span class="card-tag">Infra</span>
+        <div class="card-logo">⚡</div>
+        <div class="card-name">x402 Gateway</div>
+        <div class="card-desc">Pay-per-call monetization rail. Agent builders pay in BTC per analytics query. No subscriptions, no Stripe — machine-to-machine payments native to GOAT.</div>
+        <div class="card-stats">
+          <div class="card-stat">Settlement<span>BTC on GOAT</span></div>
+          <div class="card-stat">Mode<span>x402 DIRECT</span></div>
+        </div>
+        <a class="card-arrow" data-project-link>VIEW DETAILS →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ Project Detail Overlay ═══════════════ -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" id="detailClose">✕</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ CTA ═══════════════ -->
+<section class="cta-section section" id="cta">
+  <div class="wrap">
+    <div class="upper" style="margin-bottom:0.5rem">Start Building on GOAT Network</div>
+    <h2 class="pixel" data-glitch="true" style="margin-bottom:1rem">
+      <span class="glitch-word" data-text="READY_TO">READY TO</span>
+      <span class="glitch-word" data-text="INDEX_YOUR">INDEX YOUR</span><br>
+      <span class="glitch-word" data-text="AGENTS?">AGENTS?</span>
+    </h2>
+    <p style="font-size:0.75rem;color:var(--muted);max-width:500px;margin:0 auto 1rem">
+      Connect your ERC-8004 agent identity. Kether pulls your x402 payment history from GOAT Network. No signup, no API keys — just your agent ID.
+    </p>
+    <div class="cta-buttons">
+      <a href="https://kether-three.vercel.app" class="btn btn-solid">OPEN DASHBOARD</a>
+      <a href="https://github.com/subheeksh5599/kether" class="btn btn-ghost">VIEW ON GITHUB</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════
+   KETHER — GSAP + ScrollTrigger + Lenis + Three.js
+   ═══════════════════════════════════════════════ */
+
+// ── Lenis Smooth Scroll ──
+const lenis = new Lenis({
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smoothWheel: true,
+});
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => lenis.raf(time * 1000));
+gsap.ticker.lagSmoothing(0);
+
+// ── Nav show/hide on scroll ──
+let lastScroll = 0;
+lenis.on('scroll', ({ scroll }) => {
+  const nav = document.getElementById('nav');
+  if (scroll > lastScroll && scroll > 200) nav.classList.add('hidden');
+  else nav.classList.remove('hidden');
+  lastScroll = scroll;
+});
+
+// ── Register ScrollTrigger ──
+ScrollTrigger.scrollerProxy(document.body, {
+  scrollTop(value) { return arguments.length ? lenis.scrollTo(value, { immediate: true }) : lenis.scroll; },
+  getBoundingClientRect() { return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }; },
+  pinType: document.body.style.transform ? 'transform' : 'fixed',
+});
+
+// ── Three.js Node Network ──
+(function initNodes() {
+  const canvas = document.getElementById('node-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const parent = canvas.parentElement;
+  renderer.setSize(parent.clientWidth, parent.clientHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, parent.clientWidth / parent.clientHeight, 0.1, 100);
+  camera.position.set(0, 0, 12);
+
+  // Glass nodes
+  const nodes = [];
+  const nodeCount = 18;
+  const nodeGeo = new THREE.SphereGeometry(0.22, 32, 32);
+
+  for (let i = 0; i < nodeCount; i++) {
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      metalness: 0.05,
+      roughness: 0.1,
+      transparent: true,
+      opacity: 0.85,
+      clearcoat: 0.3,
+      envMapIntensity: 0.5,
+    });
+    const mesh = new THREE.Mesh(nodeGeo, mat);
+    mesh.position.set(
+      (Math.random() - 0.5) * 8,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 4
+    );
+    mesh.userData = {
+      basePos: mesh.position.clone(),
+      speed: 0.3 + Math.random() * 0.5,
+      offset: Math.random() * Math.PI * 2,
+    };
+    scene.add(mesh);
+    nodes.push(mesh);
+
+    // Orange glow ring
+    const ringGeo = new THREE.TorusGeometry(0.3, 0.03, 8, 24);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xff5a00, transparent: true, opacity: 0.7 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    mesh.add(ring);
+  }
+
+  // Glass tubes (connections)
+  const connections = [];
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = i + 1; j < nodeCount; j++) {
+      if (Math.random() < 0.18) {
+        const dist = nodes[i].position.distanceTo(nodes[j].position);
+        if (dist < 5) {
+          const mid = new THREE.Vector3().addVectors(nodes[i].position, nodes[j].position).multiplyScalar(0.5);
+          const dir = new THREE.Vector3().subVectors(nodes[j].position, nodes[i].position);
+          const cylGeo = new THREE.CylinderGeometry(0.02, 0.02, dist, 6);
+          const cylMat = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            metalness: 0.1,
+            roughness: 0.15,
+            transparent: true,
+            opacity: 0.35,
+            clearcoat: 0.2,
+          });
+          const cyl = new THREE.Mesh(cylGeo, cylMat);
+          cyl.position.copy(mid);
+          cyl.lookAt(nodes[j].position);
+          cyl.rotateX(Math.PI / 2);
+          scene.add(cyl);
+          connections.push({ mesh: cyl, a: nodes[i], b: nodes[j] });
+        }
+      }
+    }
+  }
+
+  // Ambient + point lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const ptLight = new THREE.PointLight(0xff5a00, 1.2, 15);
+  ptLight.position.set(2, 1, 4);
+  scene.add(ptLight);
+  const ptLight2 = new THREE.PointLight(0xffffff, 0.6, 10);
+  ptLight2.position.set(-3, -1, 2);
+  scene.add(ptLight2);
+
+  // Animate
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    nodes.forEach((n, i) => {
+      n.position.x = n.userData.basePos.x + Math.sin(t * n.userData.speed + n.userData.offset) * 0.3;
+      n.position.y = n.userData.basePos.y + Math.cos(t * n.userData.speed * 0.7 + n.userData.offset) * 0.25;
+      // Pulse glow
+      const glow = n.children[0];
+      if (glow) {
+        const s = 1 + Math.sin(t * 2.5 + i) * 0.25;
+        glow.scale.setScalar(s);
+        glow.material.opacity = 0.4 + Math.sin(t * 2.5 + i) * 0.3;
+      }
+    });
+    connections.forEach(c => {
+      const mid = new THREE.Vector3().addVectors(c.a.position, c.b.position).multiplyScalar(0.5);
+      const dist = c.a.position.distanceTo(c.b.position);
+      c.mesh.position.copy(mid);
+      c.mesh.lookAt(c.b.position);
+      c.mesh.rotateX(Math.PI / 2);
+      c.mesh.scale.y = dist / (c.mesh.geometry.parameters?.height || dist);
+    });
+    ptLight.intensity = 1.2 + Math.sin(t * 1.5) * 0.3;
+    scene.rotation.y += 0.0015;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    renderer.setSize(parent.clientWidth, parent.clientHeight);
+    camera.aspect = parent.clientWidth / parent.clientHeight;
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ── Glitch scramble on section-enter ──
+function scrambleText(el, finalText, duration = 0.8) {
+  const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let startTime = null;
+  function tick(ts) {
+    if (!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime) / (duration * 1000), 1);
+    let result = '';
+    for (let i = 0; i < finalText.length; i++) {
+      if (progress > i / finalText.length) result += finalText[i];
+      else result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    el.textContent = result;
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = finalText;
+  }
+  el.textContent = '';
+  requestAnimationFrame(tick);
+}
+
+// Glitch headlines on enter
+document.querySelectorAll('[data-glitch="true"]').forEach(heading => {
+  ScrollTrigger.create({
+    trigger: heading,
+    scroller: document.body,
+    start: 'top 85%',
+    onEnter() {
+      heading.querySelectorAll('.glitch-word').forEach(word => {
+        const original = word.textContent;
+        if (original) {
+          scrambleText(word, original, 0.6 + Math.random() * 0.4);
+        }
+      });
+    },
+    once: true,
+  });
+});
+
+// ── Card reveal on scroll ──
+gsap.utils.toArray('.bento-card').forEach((card, i) => {
+  gsap.fromTo(card,
+    { y: 60, opacity: 0 },
+    {
+      y: 0, opacity: 1,
+      duration: 0.7,
+      delay: i * 0.08,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: card,
+        scroller: document.body,
+        start: 'top 92%',
+        once: true,
+      }
+    }
+  );
+});
+
+// ── Stat count-up ──
+function countUp(el, target, prefix = '', suffix = '', decimals = 0) {
+  const format = (v) => prefix + v.toFixed(decimals) + suffix;
+  let startTime = null;
+  const duration = 1.5;
+  function tick(ts) {
+    if (!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime) / (duration * 1000), 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = format(target * eased);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+document.querySelectorAll('[data-count]').forEach(statEl => {
+  const target = parseFloat(statEl.dataset.count);
+  const prefix = statEl.dataset.prefix || '';
+  const suffix = statEl.dataset.suffix || '';
+  const decimals = target % 1 !== 0 ? 1 : 0;
+  ScrollTrigger.create({
+    trigger: statEl.closest('.stat-tile') || statEl,
+    scroller: document.body,
+    start: 'top 90%',
+    onEnter() { countUp(statEl, target, prefix, suffix, decimals); },
+    once: true,
+  });
+});
+
+// ── Magnetic hover ──
+document.querySelectorAll('.bento-card, .btn-solid, .btn-ghost').forEach(el => {
+  el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(el, {
+      x: x * 0.05,
+      y: y * 0.05,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  });
+  el.addEventListener('mouseleave', () => {
+    gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1,0.4)' });
+  });
+});
+
+// ── Filter tabs ──
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const filter = tab.dataset.filter;
+
+    gsap.to('.bento-card', {
+      opacity: 0, scale: 0.95, duration: 0.25,
+      onComplete() {
+        document.querySelectorAll('.bento-card').forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        gsap.to('.bento-card:not([style*="display: none"])', {
+          opacity: 1, scale: 1, duration: 0.4, stagger: 0.04,
+        });
+      }
+    });
+  });
+});
+
+// ── Search ──
+document.querySelector('.filter-search').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.bento-card').forEach(card => {
+    const name = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
+    const desc = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+    card.style.display = (name.includes(q) || desc.includes(q)) ? '' : 'none';
+  });
+});
+
+// ── Project Detail Overlay ──
+const projectData = {
+  kether: {
+    name: 'Kether Protocol',
+    desc: 'x402 payment analytics for AI agents on GOAT Network. Indexes every PaymentSettled event, links ERC-8004 identities, and delivers revenue intelligence dashboards. Built for the GOAT AI Builder Grants Program.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'AI / Payments',
+    raised: 'GOAT Testnet3',
+    roi: '8 tests',
+    growth: 'Solidity+FastAPI+React',
+    partners: 'MIT',
+    before: 'No x402 revenue visibility',
+    now: 'Full payment intelligence dashboard',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+  revenue: {
+    name: 'Revenue Intelligence',
+    desc: 'Total earned, monthly trend, per-service breakdown. Know exactly which endpoints generate revenue and how it grows over time. Built on indexed x402 PaymentSettled events.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'Analytics',
+    raised: 'On-chain data',
+    roi: '10s polling',
+    growth: 'Real-time',
+    partners: 'SQLite WAL',
+    before: 'Guessing agent revenue',
+    now: 'Per-endpoint revenue charts',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+  clients: {
+    name: 'Client Intelligence',
+    desc: 'Discover which clients drive 80% of your revenue. Every x402 payment has a payer address — Kether aggregates them into ranked client profiles with spending history.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'Analytics',
+    raised: 'x402 payer events',
+    roi: 'Ranked output',
+    growth: 'Per-client',
+    partners: 'On-chain',
+    before: 'Unknown who pays you',
+    now: 'Ranked client spend list',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+  predict: {
+    name: 'Growth Prediction',
+    desc: 'Linear regression on your on-chain payment history. Forecast next-month revenue with confidence intervals. x402-gated — agent builders pay per prediction query in BTC.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'ML / Analytics',
+    raised: 'scikit-learn',
+    roi: 'R² confidence',
+    growth: 'x402-gated',
+    partners: 'BTC settlement',
+    before: 'No growth forecasting',
+    now: 'ML-driven revenue prediction',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+  identity: {
+    name: 'ERC-8004 Identity Link',
+    desc: 'Every payment linked to a verifiable agent identity on GOAT Network. No impersonation. Every Kether analytics page is provably tied to an on-chain ERC-8004 agent profile.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'Identity',
+    raised: 'ERC-8004',
+    roi: 'On-chain registry',
+    growth: 'Verifiable',
+    partners: 'GOAT Network',
+    before: 'Anonymous agent payments',
+    now: 'Verifiable agent profiles',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+  nox: {
+    name: 'Nox',
+    desc: 'Privacy-preserving credential verification on Midnight Network. Zero-knowledge proofs for enterprise identity — verify credentials without revealing underlying data.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'Privacy / ZK',
+    raised: 'Midnight Network',
+    roi: 'Compact 0.5.1',
+    growth: 'ZK proofs',
+    partners: 'Enterprise',
+    before: 'Centralized identity silos',
+    now: 'ZK credential verification',
+    website: 'https://nox-smoky.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/nox',
+  },
+  x402gate: {
+    name: 'x402 Payment Gateway',
+    desc: 'Pay-per-call monetization rail for AI agents. Agent builders pay in BTC per analytics query. No subscriptions, no Stripe — machine-to-machine payments native to GOAT Network.',
+    founded: '2025',
+    year: '2025',
+    vertical: 'Payments / Infra',
+    raised: 'BTC settlement',
+    roi: 'x402 DIRECT',
+    growth: 'Pay-per-call',
+    partners: 'GOAT Network',
+    before: 'Subscription billing for agents',
+    now: 'Native x402 per-call pricing',
+    website: 'https://kether-three.vercel.app',
+    twitter: 'https://github.com/subheeksh5599/kether',
+  },
+};
+
+function openDetail(projectId) {
+  const data = projectData[projectId];
+  if (!data) return;
+  const content = document.getElementById('detailContent');
+  content.innerHTML = `
+    <div class="detail-name">${data.name}</div>
+    <div class="detail-desc">${data.desc}</div>
+    <div class="detail-links">
+      <a href="${data.website}" class="btn btn-solid btn-sm" target="_blank">Visit Website ↗</a>
+      <a href="${data.twitter}" class="btn btn-ghost btn-sm" target="_blank">Twitter ↗</a>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <div class="upper">Founded</div>
+        <div>${data.founded}</div>
+      </div>
+      <div class="detail-meta-item">
+        <div class="upper">Incubation Year</div>
+        <div>${data.year}</div>
+      </div>
+      <div class="detail-meta-item">
+        <div class="upper">Vertical</div>
+        <div>${data.vertical}</div>
+      </div>
+    </div>
+    <div class="detail-timeline">
+      <div class="timeline-point">
+        <div class="upper">Before Incubation</div>
+        <div class="val">${data.before}</div>
+      </div>
+      <div class="timeline-arrow">→</div>
+      <div class="timeline-point">
+        <div class="upper">Now</div>
+        <div class="val">${data.now}</div>
+      </div>
+    </div>
+    <div class="chrome-block">
+      <div class="upper">Tech Stack</div>
+      <div class="stat-val">${data.raised} · ${data.roi} · ${data.growth} · ${data.partners}</div>
+    </div>
+  `;
+  document.getElementById('detailOverlay').classList.add('open');
+  lenis.stop();
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  lenis.start();
+}
+
+document.querySelectorAll('.bento-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    const pid = card.dataset.project;
+    if (pid) openDetail(pid);
+  });
+});
+
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+document.getElementById('detailOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeDetail();
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
+
+// ── Cleanup on unload ──
+window.addEventListener('beforeunload', () => { lenis.destroy(); });
+</script>
+</body>
+</html>

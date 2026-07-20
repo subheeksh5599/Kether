@@ -1,142 +1,164 @@
 import { useRevenue, useClients, useServices, usePredict } from "../hooks/useApi";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { ArrowLeft, TrendingUp, Users, Zap, DollarSign } from "lucide-react";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from "recharts";
 
 interface Props {
   agentId: string;
   onBack: () => void;
+  onClear: () => void;
 }
 
-const COLORS = ["#E84142", "#FF6B6B", "#FF8E8E", "#FFB3B3", "#FFD6D6", "#FFEAEA"];
+const ORANGE_SCALE = ["#ff5a00", "#ff7a2e", "#ff9a5c", "#ffba8a", "#ffd4b8", "#ffe8d6"];
 
-export default function Dashboard({ agentId, onBack }: Props) {
+export default function Dashboard({ agentId, onBack, onClear }: Props) {
   const { revenue, loading: revLoading } = useRevenue(agentId);
-  const { clients, loading: cliLoading } = useClients(agentId);
-  const { services, loading: svcLoading } = useServices(agentId);
+  const { clients } = useClients(agentId);
+  const { services } = useServices(agentId);
   const { predict, loading: predLoading, prediction, runPrediction } = usePredict(agentId);
-
-  const id = parseInt(agentId);
 
   if (revLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full" />
+      <div style={{ textAlign: "center", padding: "3rem" }}>
+        <div className="spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-6 py-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2 rounded-lg hover:bg-[var(--surface)] transition-colors">
-            <ArrowLeft size={20} />
+    <div>
+      {/* Mini header */}
+      <div className="dash-header">
+        <div className="dash-header-left">
+          <button onClick={onClear} className="btn btn-ghost btn-sm" style={{ padding: "0.4rem 0.7rem" }}>
+            ← BACK TO SITE
           </button>
           <div>
-            <h1 className="text-2xl font-bold">
-              Agent <span style={{ color: "var(--accent)" }}>#{agentId}</span>
-            </h1>
-            <p className="text-xs text-[var(--muted)]">GOAT Network · ERC-8004 · x402 Payments</p>
+            <h3 className="pixel" style={{ fontSize: "1.4rem", marginBottom: "0.1rem" }}>
+              AGENT <span style={{ color: "var(--accent)" }}>#{agentId}</span>
+            </h3>
+            <p className="upper" style={{ fontSize: "0.5rem" }}>GOAT Network · ERC-8004 · x402 Payments</p>
           </div>
         </div>
+        <div className="tag">LIVE · TESTNET3</div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <KpiCard icon={<DollarSign size={18} />} label="Total Revenue" value={`${formatBTC(revenue?.total_revenue || "0")} BTC`} />
-        <KpiCard icon={<Zap size={18} />} label="Transactions" value={String(revenue?.transaction_count || 0)} />
-        <KpiCard icon={<Users size={18} />} label="Unique Clients" value={String(revenue?.unique_clients || 0)} />
-        <KpiCard icon={<TrendingUp size={18} />} label="Chain" value="GOAT Testnet3" />
+      <div className="kpi-grid">
+        <KpiCard label="Total Revenue" value={`${formatBTC(revenue?.total_revenue || "0")} BTC`} />
+        <KpiCard label="Transactions" value={String(revenue?.transaction_count || 0)} />
+        <KpiCard label="Unique Clients" value={String(revenue?.unique_clients || 0)} />
+        <KpiCard label="Chain" value="GOAT Testnet3" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Service Revenue Bar Chart */}
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
-          <h3 className="text-sm font-semibold mb-4 text-[var(--muted)] uppercase tracking-wider">Service Revenue</h3>
+      {/* Charts Row */}
+      <div className="chart-grid">
+        <div className="chart-box">
+          <h4>Service Revenue (BTC)</h4>
           {services.length > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={services.map((s) => ({ name: s.service_id, revenue: parseInt(s.total_revenue) / 1e18 }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 12 }} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                <Bar dataKey="revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} />
+                <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 10, fontFamily: "'Space Mono', monospace" }} />
+                <YAxis tick={{ fill: "var(--muted)", fontSize: 10, fontFamily: "'Space Mono', monospace" }} />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface)", border: "1px solid var(--border)",
+                    fontFamily: "'Space Mono', monospace", fontSize: "0.7rem",
+                  }}
+                />
+                <Bar dataKey="revenue" fill="var(--accent)" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyState text="No service data yet" />
+            <Empty text="No service data yet" />
           )}
         </div>
 
-        {/* Client Spending Pie */}
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
-          <h3 className="text-sm font-semibold mb-4 text-[var(--muted)] uppercase tracking-wider">Client Breakdown</h3>
+        <div className="chart-box">
+          <h4>Client Breakdown</h4>
           {clients.length > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={240}>
               <PieChart>
-                <Pie data={clients.slice(0, 5).map((c, i) => ({ name: c.address.slice(0, 8) + "...", value: parseInt(c.total_spent) / 1e18 }))} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value">
+                <Pie
+                  data={clients.slice(0, 5).map((c) => ({
+                    name: c.address.slice(0, 8) + "...",
+                    value: parseInt(c.total_spent) / 1e18,
+                  }))}
+                  cx="50%" cy="50%" outerRadius={85} innerRadius={45} dataKey="value"
+                >
                   {clients.slice(0, 5).map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell key={i} fill={ORANGE_SCALE[i % ORANGE_SCALE.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface)", border: "1px solid var(--border)",
+                    fontFamily: "'Space Mono', monospace", fontSize: "0.7rem",
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyState text="No client data yet" />
+            <Empty text="No client data yet" />
           )}
         </div>
       </div>
 
       {/* Client Table */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 mb-8">
-        <h3 className="text-sm font-semibold mb-4 text-[var(--muted)] uppercase tracking-wider">Top Clients</h3>
+      <div className="dash-card" style={{ marginBottom: "1.5rem" }}>
+        <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
+          Top Clients
+        </h4>
         {clients.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div style={{ overflowX: "auto" }}>
+            <table className="data-table">
               <thead>
-                <tr className="text-[var(--muted)] text-left">
-                  <th className="pb-3 font-medium">Client</th>
-                  <th className="pb-3 font-medium">Total Spent</th>
-                  <th className="pb-3 font-medium">Txns</th>
-                  <th className="pb-3 font-medium">Last Active</th>
+                <tr>
+                  <th>Client Address</th>
+                  <th>Total Spent</th>
+                  <th>Txns</th>
+                  <th>Last Active</th>
                 </tr>
               </thead>
               <tbody>
                 {clients.map((c, i) => (
-                  <tr key={i} className="border-t border-[var(--border)]">
-                    <td className="py-3 font-mono text-xs">{c.address.slice(0, 12)}...{c.address.slice(-6)}</td>
-                    <td className="py-3">{formatBTC(c.total_spent)} BTC</td>
-                    <td className="py-3">{c.transaction_count}</td>
-                    <td className="py-3 text-[var(--muted)]">{timeAgo(c.last_payment)}</td>
+                  <tr key={i}>
+                    <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.65rem" }}>
+                      {c.address.slice(0, 14)}...{c.address.slice(-6)}
+                    </td>
+                    <td>{formatBTC(c.total_spent)} BTC</td>
+                    <td>{c.transaction_count}</td>
+                    <td style={{ color: "var(--muted)" }}>{timeAgo(c.last_payment)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <EmptyState text="No client data yet" />
+          <Empty text="No client data yet" />
         )}
       </div>
 
-      {/* Prediction Panel */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
-        <h3 className="text-sm font-semibold mb-4 text-[var(--muted)] uppercase tracking-wider">Revenue Prediction</h3>
+      {/* Prediction */}
+      <div className="dash-card">
+        <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
+          Revenue Prediction
+        </h4>
         {services.length > 0 ? (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
             {services.slice(0, 6).map((s) => (
               <button
                 key={s.service_id}
                 onClick={() => runPrediction(s.service_id)}
                 disabled={predLoading}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border"
+                className="btn btn-sm"
                 style={{
                   background: predict === s.service_id ? "var(--accent)" : "transparent",
                   borderColor: predict === s.service_id ? "var(--accent)" : "var(--border)",
-                  color: predict === s.service_id ? "white" : "var(--muted)",
+                  color: predict === s.service_id ? "#fff" : "var(--muted)",
+                  cursor: predLoading ? "wait" : "pointer",
                 }}
               >
                 {s.service_id}
@@ -144,34 +166,41 @@ export default function Dashboard({ agentId, onBack }: Props) {
             ))}
           </div>
         ) : null}
-        {prediction && (
-          <div className="mt-4 p-4 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5">
-            <p className="text-sm text-[var(--muted)]">Predicted 30-day revenue for <strong>{prediction.endpoint}</strong>:</p>
-            <p className="text-2xl font-bold mt-1" style={{ color: "var(--accent)" }}>
-              {formatBTC(prediction.predicted_revenue_30d)} BTC
+        {predLoading && <div className="spinner" />}
+        {prediction && !predLoading && (
+          <div className="prediction-badge">
+            <p className="upper" style={{ fontSize: "0.55rem", marginBottom: "0.25rem" }}>
+              Predicted 30-day revenue for {prediction.endpoint}
             </p>
-            <p className="text-xs text-[var(--muted)] mt-1">Confidence: {(prediction.confidence * 100).toFixed(0)}% · Linear Regression</p>
+            <p className="big">{formatBTC(prediction.predicted_revenue_30d)} BTC</p>
+            <p className="upper" style={{ fontSize: "0.5rem", marginTop: "0.35rem" }}>
+              Confidence: {(prediction.confidence * 100).toFixed(0)}% · Linear Regression
+            </p>
           </div>
         )}
-        {!prediction && (
-          <EmptyState text="Select a service endpoint to predict 30-day revenue" />
+        {!prediction && !predLoading && (
+          <Empty text="Select a service endpoint to predict 30-day revenue" />
         )}
       </div>
     </div>
   );
 }
 
-function KpiCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function KpiCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-      <div className="flex items-center gap-2 text-[var(--muted)] mb-2">{icon}<span className="text-xs uppercase tracking-wider">{label}</span></div>
-      <div className="text-xl font-bold">{value}</div>
+    <div>
+      <div className="upper" style={{ fontSize: "0.5rem", marginBottom: "0.25rem" }}>{label}</div>
+      <div className="pixel" style={{ fontSize: "1.4rem", color: "var(--accent)" }}>{value}</div>
     </div>
   );
 }
 
-function EmptyState({ text }: { text: string }) {
-  return <div className="text-center py-12 text-[var(--muted)] text-sm">{text}</div>;
+function Empty({ text }: { text: string }) {
+  return (
+    <div style={{ textAlign: "center", padding: "3rem 1rem", color: "var(--muted)", fontSize: "0.65rem", fontFamily: "'Space Mono',monospace", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      {text}
+    </div>
+  );
 }
 
 function formatBTC(wei: string): string {
