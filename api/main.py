@@ -1,23 +1,22 @@
 """
-Kether API — x402 payment analytics for GOAT Network agents.
+Kether API — GOAT Network chain analytics.
+
+Phase 1 (now): real-time chain metrics — blocks, transactions, gas, active addresses.
+Phase 2 (future): x402 payment analytics when agent ecosystem matures.
 
 Endpoints:
-  GET  /agent/{agent_id}/revenue   — total revenue, txns, clients
-  GET  /agent/{agent_id}/clients   — top client breakdown
-  GET  /agent/{agent_id}/services  — per-service revenue rankings
-  GET  /agent/{agent_id}/payments  — recent payment history
-  GET  /health                     — liveness check
-  POST /predict                    — growth prediction (x402-gated)
+  GET  /chain/stats        — total blocks, txns, addresses, gas
+  GET  /chain/blocks       — recent blocks
+  GET  /chain/transactions — recent transactions
+  GET  /health             — liveness check
 """
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from engine.predictor import predict_revenue
 from engine.store import get_db
-import time
 
-app = FastAPI(title="Kether API", version="0.1.0")
+app = FastAPI(title="Kether API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,141 +28,87 @@ app.add_middleware(
 
 # ── Models ────────────────────────────────────────
 
-class RevenueResponse(BaseModel):
-    agent_id: int
-    total_revenue: str
-    transaction_count: int
-    unique_clients: int
+class ChainStats(BaseModel):
+    total_blocks: int
+    total_txns: int
+    total_addresses: int
+    total_gas: str
+    last_block: int
     chain_id: int = 48816
+    network: str = "GOAT Testnet3"
 
-class ClientRow(BaseModel):
-    address: str
-    total_spent: str
-    transaction_count: int
-    last_payment: int
+class BlockRow(BaseModel):
+    number: int
+    hash: str
+    timestamp: int
+    tx_count: int
 
-class ClientsResponse(BaseModel):
-    agent_id: int
-    clients: list[ClientRow]
+class BlocksResponse(BaseModel):
+    blocks: list[BlockRow]
 
-class ServiceRow(BaseModel):
-    service_id: str
-    total_revenue: str
-    call_count: int
-
-class ServicesResponse(BaseModel):
-    agent_id: int
-    services: list[ServiceRow]
-
-class PaymentRow(BaseModel):
+class TxnRow(BaseModel):
+    hash: str
     block_number: int
-    tx_hash: str
-    payer: str
-    amount: str
-    service_id: str
+    from_addr: str
+    to_addr: str | None
+    value: str
     timestamp: int
 
-class PaymentsResponse(BaseModel):
-    agent_id: int
-    payments: list[PaymentRow]
-
-class PredictRequest(BaseModel):
-    agent_id: int
-    endpoint: str
-
-class PredictResponse(BaseModel):
-    agent_id: int
-    endpoint: str
-    predicted_revenue_30d: str
-    confidence: float
-    model: str = "linear_regression"
+class TxnsResponse(BaseModel):
+    transactions: list[TxnRow]
 
 
 # ── Routes ────────────────────────────────────────
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "chain": "GOAT Testnet3", "chain_id": 48816}
+    return {"status": "ok", "network": "GOAT Testnet3", "chain_id": 48816}
 
 
-@app.get("/agent/{agent_id}/revenue", response_model=RevenueResponse)
-async def agent_revenue(agent_id: int):
+@app.get("/chain/stats", response_model=ChainStats)
+async def chain_stats():
     db = get_db()
-    row = db.execute(
-        "SELECT total_revenue, transaction_count, unique_clients FROM agent_revenue WHERE agent_id = ?",
-        (agent_id,),
-    ).fetchone()
+    row = db.execute("SELECT * FROM chain_stats WHERE id = 1").fetchone()
     if not row:
-        return RevenueResponse(agent_id=agent_id, total_revenue="0", transaction_count=0, unique_clients=0)
-    return RevenueResponse(
-        agent_id=agent_id,
-        total_revenue=row["total_revenue"],
-        transaction_count=row["transaction_count"],
-        unique_clients=row["unique_clients"],
+        return ChainStats(total_blocks=0, total_txns=0, total_addresses=0, total_gas="0", last_block=0)
+    return ChainStats(
+        total_blocks=row["total_blocks"],
+        total_txns=row["total_txns"],
+        total_addresses=row["total_addresses"],
+        total_gas=row["total_gas"],
+        last_block=row["last_block"],
     )
 
 
-@app.get("/agent/{agent_id}/clients", response_model=ClientsResponse)
-async def agent_clients(agent_id: int):
+@app.get("/chain/blocks", response_model=BlocksResponse)
+async def chain_blocks(limit: int = Query(default=20, le=100)):
     db = get_db()
     rows = db.execute(
-        "SELECT client, total_spent, transaction_count, last_payment FROM client_spending WHERE agent_id = ? ORDER BY CAST(total_spent AS INTEGER) DESC LIMIT 20",
-        (agent_id,),
+        "SELECT number, hash, timestamp, tx_count FROM blocks ORDER BY number DESC LIMIT ?",
+        (limit,),
     ).fetchall()
-    return ClientsResponse(
-        agent_id=agent_id,
-        clients=[
-            ClientRow(address=r["client"], total_spent=r["total_spent"], transaction_count=r["transaction_count"], last_payment=r["last_payment"])
-            for r in rows
-        ],
+    return BlocksResponse(
+        blocks=[BlockRow(number=r["number"], hash=r["hash"], timestamp=r["timestamp"], tx_count=r["tx_count"]) for r in rows]
     )
 
 
-@app.get("/agent/{agent_id}/services", response_model=ServicesResponse)
-async def agent_services(agent_id: int):
+@app.get("/chain/transactions", response_model=TxnsResponse)
+async def chain_transactions(limit: int = Query(default=20, le=100)):
     db = get_db()
     rows = db.execute(
-        "SELECT service_id, total_revenue, call_count FROM service_revenue WHERE agent_id = ? ORDER BY CAST(total_revenue AS INTEGER) DESC",
-        (agent_id,),
+        "SELECT hash, block_number, from_addr, to_addr, value, timestamp FROM transactions ORDER BY timestamp DESC LIMIT ?",
+        (limit,),
     ).fetchall()
-    return ServicesResponse(
-        agent_id=agent_id,
-        services=[
-            ServiceRow(service_id=r["service_id"], total_revenue=r["total_revenue"], call_count=r["call_count"])
+    return TxnsResponse(
+        transactions=[
+            TxnRow(
+                hash=r["hash"],
+                block_number=r["block_number"],
+                from_addr=r["from_addr"],
+                to_addr=r["to_addr"],
+                value=r["value"],
+                timestamp=r["timestamp"],
+            )
             for r in rows
-        ],
-    )
-
-
-@app.get("/agent/{agent_id}/payments", response_model=PaymentsResponse)
-async def agent_payments(agent_id: int, limit: int = 50):
-    db = get_db()
-    rows = db.execute(
-        "SELECT block_number, tx_hash, payer, amount, service_id, timestamp FROM payments WHERE agent_id = ? ORDER BY timestamp DESC LIMIT ?",
-        (agent_id, limit),
-    ).fetchall()
-    return PaymentsResponse(
-        agent_id=agent_id,
-        payments=[
-            PaymentRow(block_number=r["block_number"], tx_hash=r["tx_hash"], payer=r["payer"], amount=r["amount"], service_id=r["service_id"], timestamp=r["timestamp"])
-            for r in rows
-        ],
-    )
-
-
-@app.post("/predict", response_model=PredictResponse)
-async def predict(req: PredictRequest, request: Request):
-    # x402 payment verification — in production, validate X-PAYMENT header
-    # For testnet: accept all requests, log payment intent
-    x_payment = request.headers.get("X-PAYMENT", "")
-    if not x_payment:
-        # In production: raise HTTPException(status_code=402)
-        pass  # Testnet mode: allow unpaid requests
-
-    predicted, confidence = predict_revenue(req.agent_id, req.endpoint)
-    return PredictResponse(
-        agent_id=req.agent_id,
-        endpoint=req.endpoint,
-        predicted_revenue_30d=str(predicted),
-        confidence=round(confidence, 2),
+        ]
     )

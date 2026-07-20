@@ -1,186 +1,141 @@
-import { useRevenue, useClients, useServices, usePredict } from "../hooks/useApi";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
-} from "recharts";
+import { useChainStats, useRecentBlocks, useRecentTxns } from "../hooks/useChainApi";
 
-interface Props {
-  agentId: string;
-  onBack: () => void;
-  onClear: () => void;
+function truncate(s: string, n: number = 8) {
+  if (!s) return "";
+  return s.length <= n * 2 + 4 ? s : s.slice(0, n) + "..." + s.slice(-n);
 }
 
-const ORANGE_SCALE = ["#ff5a00", "#ff7a2e", "#ff9a5c", "#ffba8a", "#ffd4b8", "#ffe8d6"];
+function timeAgo(ts: number): string {
+  if (!ts) return "never";
+  const diff = Math.floor(Date.now() / 1000) - ts;
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 
-export default function Dashboard({ agentId, onBack, onClear }: Props) {
-  const { revenue, loading: revLoading } = useRevenue(agentId);
-  const { clients } = useClients(agentId);
-  const { services } = useServices(agentId);
-  const { predict, loading: predLoading, prediction, runPrediction } = usePredict(agentId);
+function formatGas(gas: string): string {
+  const gwei = parseInt(gas) / 1e9;
+  if (gwei < 1) return gwei.toFixed(2) + " gwei";
+  if (gwei < 1000) return gwei.toFixed(0) + " gwei";
+  return (gwei / 1000).toFixed(1) + "K gwei";
+}
 
-  if (revLoading) {
-    return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
-        <div className="spinner" />
-      </div>
-    );
-  }
+export default function Dashboard() {
+  const { stats, loading: statsLoading } = useChainStats();
+  const { blocks } = useRecentBlocks();
+  const { txns } = useRecentTxns();
 
   return (
-    <div>
-      {/* Mini header */}
-      <div className="dash-header">
-        <div className="dash-header-left">
-          <button onClick={onClear} className="btn btn-ghost btn-sm" style={{ padding: "0.4rem 0.7rem" }}>
-            ← BACK TO SITE
-          </button>
-          <div>
-            <h3 className="pixel" style={{ fontSize: "1.4rem", marginBottom: "0.1rem" }}>
-              AGENT <span style={{ color: "var(--accent)" }}>#{agentId}</span>
-            </h3>
-            <p className="upper" style={{ fontSize: "0.5rem" }}>GOAT Network · ERC-8004 · x402 Payments</p>
+    <div style={{ minHeight: "100vh", padding: "2rem 0" }}>
+      <div className="wrap">
+        {/* Header */}
+        <div className="dash-header">
+          <div className="dash-header-left">
+            <div>
+              <h3 className="pixel" style={{ fontSize: "1.4rem", marginBottom: "0.1rem" }}>
+                GOAT NETWORK <span style={{ color: "var(--accent)" }}>TESTNET3</span>
+              </h3>
+              <p className="upper" style={{ fontSize: "0.5rem" }}>Real-time chain analytics · Phase 1</p>
+            </div>
           </div>
-        </div>
-        <div className="tag">LIVE · TESTNET3</div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="kpi-grid">
-        <KpiCard label="Total Revenue" value={`${formatBTC(revenue?.total_revenue || "0")} BTC`} />
-        <KpiCard label="Transactions" value={String(revenue?.transaction_count || 0)} />
-        <KpiCard label="Unique Clients" value={String(revenue?.unique_clients || 0)} />
-        <KpiCard label="Chain" value="GOAT Testnet3" />
-      </div>
-
-      {/* Charts Row */}
-      <div className="chart-grid">
-        <div className="chart-box">
-          <h4>Service Revenue (BTC)</h4>
-          {services.length > 0 ? (
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={services.map((s) => ({ name: s.service_id, revenue: parseInt(s.total_revenue) / 1e18 }))}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 10, fontFamily: "'Space Mono', monospace" }} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 10, fontFamily: "'Space Mono', monospace" }} />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--surface)", border: "1px solid var(--border)",
-                    fontFamily: "'Space Mono', monospace", fontSize: "0.7rem",
-                  }}
-                />
-                <Bar dataKey="revenue" fill="var(--accent)" />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <Empty text="No service data yet" />
-          )}
+          <div className="tag">{statsLoading ? "SYNCING..." : `BLOCK #${stats?.last_block?.toLocaleString() || "..."}`}</div>
         </div>
 
-        <div className="chart-box">
-          <h4>Client Breakdown</h4>
-          {clients.length > 0 ? (
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={clients.slice(0, 5).map((c) => ({
-                    name: c.address.slice(0, 8) + "...",
-                    value: parseInt(c.total_spent) / 1e18,
-                  }))}
-                  cx="50%" cy="50%" outerRadius={85} innerRadius={45} dataKey="value"
-                >
-                  {clients.slice(0, 5).map((_, i) => (
-                    <Cell key={i} fill={ORANGE_SCALE[i % ORANGE_SCALE.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--surface)", border: "1px solid var(--border)",
-                    fontFamily: "'Space Mono', monospace", fontSize: "0.7rem",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <Empty text="No client data yet" />
-          )}
+        {/* KPI Cards */}
+        <div className="kpi-grid">
+          <KpiCard label="Blocks Indexed" value={statsLoading ? "..." : (stats?.total_blocks?.toLocaleString() || "0")} />
+          <KpiCard label="Transactions" value={statsLoading ? "..." : (stats?.total_txns?.toLocaleString() || "0")} />
+          <KpiCard label="Active Addresses" value={statsLoading ? "..." : (stats?.total_addresses?.toLocaleString() || "0")} />
+          <KpiCard label="Total Gas Used" value={statsLoading ? "..." : (stats ? formatGas(stats.total_gas) : "0")} />
         </div>
-      </div>
 
-      {/* Client Table */}
-      <div className="dash-card" style={{ marginBottom: "1.5rem" }}>
-        <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
-          Top Clients
-        </h4>
-        {clients.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Client Address</th>
-                  <th>Total Spent</th>
-                  <th>Txns</th>
-                  <th>Last Active</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clients.map((c, i) => (
-                  <tr key={i}>
-                    <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.65rem" }}>
-                      {c.address.slice(0, 14)}...{c.address.slice(-6)}
-                    </td>
-                    <td>{formatBTC(c.total_spent)} BTC</td>
-                    <td>{c.transaction_count}</td>
-                    <td style={{ color: "var(--muted)" }}>{timeAgo(c.last_payment)}</td>
+        {/* Recent Blocks */}
+        <div className="dash-card" style={{ marginBottom: "1.5rem" }}>
+          <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
+            Recent Blocks
+          </h4>
+          {blocks.length > 0 ? (
+            <div style={{ overflowX: "auto" }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Block</th>
+                    <th>Hash</th>
+                    <th>Txns</th>
+                    <th>Age</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <Empty text="No client data yet" />
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {blocks.slice(0, 15).map((b) => (
+                    <tr key={b.number}>
+                      <td style={{ fontFamily: "'DotGothic16',monospace", color: "var(--accent)", fontSize: "0.9rem" }}>
+                        #{b.number.toLocaleString()}
+                      </td>
+                      <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.65rem" }}>
+                        {truncate(b.hash, 8)}
+                      </td>
+                      <td>{b.tx_count}</td>
+                      <td style={{ color: "var(--muted)" }}>{timeAgo(b.timestamp)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Empty text="Indexing blocks from GOAT Testnet3..." />
+          )}
+        </div>
 
-      {/* Prediction */}
-      <div className="dash-card">
-        <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
-          Revenue Prediction
-        </h4>
-        {services.length > 0 ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
-            {services.slice(0, 6).map((s) => (
-              <button
-                key={s.service_id}
-                onClick={() => runPrediction(s.service_id)}
-                disabled={predLoading}
-                className="btn btn-sm"
-                style={{
-                  background: predict === s.service_id ? "var(--accent)" : "transparent",
-                  borderColor: predict === s.service_id ? "var(--accent)" : "var(--border)",
-                  color: predict === s.service_id ? "#fff" : "var(--muted)",
-                  cursor: predLoading ? "wait" : "pointer",
-                }}
-              >
-                {s.service_id}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        {predLoading && <div className="spinner" />}
-        {prediction && !predLoading && (
-          <div className="prediction-badge">
-            <p className="upper" style={{ fontSize: "0.55rem", marginBottom: "0.25rem" }}>
-              Predicted 30-day revenue for {prediction.endpoint}
-            </p>
-            <p className="big">{formatBTC(prediction.predicted_revenue_30d)} BTC</p>
-            <p className="upper" style={{ fontSize: "0.5rem", marginTop: "0.35rem" }}>
-              Confidence: {(prediction.confidence * 100).toFixed(0)}% · Linear Regression
-            </p>
-          </div>
-        )}
-        {!prediction && !predLoading && (
-          <Empty text="Select a service endpoint to predict 30-day revenue" />
-        )}
+        {/* Recent Transactions */}
+        <div className="dash-card">
+          <h4 style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted)", marginBottom: "1rem", fontWeight: 400 }}>
+            Recent Transactions
+          </h4>
+          {txns.length > 0 ? (
+            <div style={{ overflowX: "auto" }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Txn Hash</th>
+                    <th>Block</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Age</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {txns.slice(0, 20).map((tx) => (
+                    <tr key={tx.hash}>
+                      <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.65rem" }}>
+                        <a
+                          href={`https://explorer.testnet3.goat.network/tx/${tx.hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "var(--accent)", textDecoration: "none" }}
+                        >
+                          {truncate(tx.hash, 6)}
+                        </a>
+                      </td>
+                      <td style={{ fontFamily: "'DotGothic16',monospace", fontSize: "0.7rem" }}>
+                        #{tx.block_number}
+                      </td>
+                      <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem" }}>
+                        {truncate(tx.from_addr, 5)}
+                      </td>
+                      <td style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.6rem" }}>
+                        {tx.to_addr ? truncate(tx.to_addr, 5) : "Contract"}
+                      </td>
+                      <td style={{ color: "var(--muted)", fontSize: "0.6rem" }}>{timeAgo(tx.timestamp)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Empty text="Waiting for transactions..." />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -201,21 +156,4 @@ function Empty({ text }: { text: string }) {
       {text}
     </div>
   );
-}
-
-function formatBTC(wei: string): string {
-  const btc = parseInt(wei) / 1e18;
-  if (btc === 0) return "0";
-  if (btc < 0.001) return btc.toFixed(6);
-  if (btc < 1) return btc.toFixed(4);
-  return btc.toFixed(2);
-}
-
-function timeAgo(ts: number): string {
-  if (!ts) return "never";
-  const diff = Math.floor(Date.now() / 1000) - ts;
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
 }

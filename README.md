@@ -4,20 +4,17 @@
 
 [![Live demo](https://img.shields.io/badge/●_live-kether--three.vercel.app-E84142)](https://kether-three.vercel.app)
 [![GOAT Testnet3](https://img.shields.io/badge/📜_Testnet3-KetherIndexer-14151a)](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)
-[![x402](https://img.shields.io/badge/💰_x402-payments-14151a)](https://docs.goat.network/docs/build/x402)
-[![ERC-8004](https://img.shields.io/badge/🆔_ERC--8004-identity-14151a)](https://docs.goat.network/docs/build/erc-8004)
-[![License: MIT](https://img.shields.io/badge/license-MIT-E84142.svg)](LICENSE)
-![Tests](https://img.shields.io/badge/tests-8%20passing-3fb950)
-![Stack](https://img.shields.io/badge/Solidity%20·%20FastAPI%20·%20React%2019%20·%20TypeScript-14151a)
+[![Tests](https://img.shields.io/badge/tests-8%20passing-3fb950)](.)
+![Stack](https://img.shields.io/badge/TypeScript%20·%20FastAPI%20·%20React%2019-14151a)
 ![GOAT Network](https://img.shields.io/badge/GOAT_Network-Testnet3-E84142)
 
-### AI agents pay each other millions of times a day. Nobody knows who earns what.
+### GOAT Network chain explorer and analytics. Phase 1: every block, every transaction, every address — indexed in real time.
 
-Kether indexes every x402 payment on GOAT Network and turns raw on-chain data into revenue intelligence for agent builders — which endpoints earn, which clients spend, what to charge next. Built for the GOAT AI Builder Grants Program.
+Kether polls GOAT Testnet3 every 10 seconds and builds a live dashboard of chain activity. Blocks, transactions, active addresses, gas usage. Built for the GOAT AI Builder Grants Program ($500 base grant).
 
-### ▶ Live now — x402 payment analytics at [kether-three.vercel.app](https://kether-three.vercel.app)
+### ▶ Live now — chain analytics at [kether-three.vercel.app](https://kether-three.vercel.app)
 
-**[ Live demo ↗ ](https://kether-three.vercel.app)** · **[ KetherIndexer on GOAT Explorer ↗ ](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)** · **[ Architecture ↓ ](#architecture)** · **[ Run it locally ↓ ](#run-it-locally)**
+**[ Live demo ↗ ](https://kether-three.vercel.app)** · **[ KetherIndexer on GOAT Explorer ↗ ](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)** · **[ Architecture ↓ ](#architecture)**
 
 Built for the GOAT Network ecosystem. MIT licensed.
 
@@ -27,99 +24,79 @@ Built for the GOAT Network ecosystem. MIT licensed.
 
 ## Table of contents
 
-- [See it in one command](#-see-it-in-one-command)
+- [Phase 1 vs Phase 2 — the honesty section](#phase-1-vs-phase-2--the-honesty-section)
 - [The problem Kether solves](#the-problem-kether-solves)
 - [How Kether works](#how-kether-works)
-  - [1 · x402 payment indexing](#1--x402-payment-indexing)
-  - [2 · revenue intelligence](#2--revenue-intelligence)
-  - [3 · client breakdown](#3--client-breakdown)
-  - [4 · growth prediction](#4--growth-prediction)
-  - [5 · ERC-8004 agent identity](#5--erc-8004-agent-identity)
 - [Architecture](#architecture)
-  - [Data flow](#data-flow)
-  - [Component by component](#component-by-component)
-- [x402 use case](#x402-use-case)
-- [What's real vs pending — the honesty table](#whats-real-vs-pending--the-honesty-table)
-- [How it uses GOAT Network](#how-it-uses-goat-network)
+- [What's real vs pending](#whats-real-vs-pending)
 - [Engineering decisions](#engineering-decisions--the-hard-problems)
 - [Tests](#tests)
 - [Run it locally](#run-it-locally)
-- [Configuration](#configuration)
 - [Deploy](#deploy)
 - [Project layout](#project-layout)
-- [Tech stack](#tech-stack)
 - [Roadmap](#roadmap)
-- [License](#license)
 
 ---
 
-## ▶ See it in one command
+## Phase 1 vs Phase 2 — the honesty section
 
-Kether reads x402 payment events directly from GOAT Network. Every query is a `cast call` — read-only, no gas:
+Kether is built in two phases.
 
-```bash
-RPC=https://rpc.testnet3.goat.network
-INDEXER=0x8248b253033400a59C751F9c2D3BCCAc5428f6D4
+### Phase 1 (now · live)
 
-# Query total revenue for an ERC-8004 agent (seeded with test data)
-$ cast call $INDEXER "getAgentRevenue(uint256)(uint256,uint256,uint256)" \
-    4893 --rpc-url $RPC
-(1350000000000000000000, 5, 4)
+**GOAT Network chain analytics.** The indexer polls GOAT Testnet3 every 10 seconds. It indexes every block, every transaction, every address. The dashboard shows real-time chain metrics:
 
-# Query top clients for agent #4893
-$ cast call $INDEXER "getTopClients(uint256,uint256)(address[],uint256[])" \
-    4893 5 --rpc-url $RPC
-["0x1111...","0x2222...","0x3333...","0x4444..."]
-[500000000000000000000,320000000000000000000,280000000000000000000,150000000000000000000,100000000000000000000]
+- Total blocks indexed
+- Total transactions processed
+- Active addresses tracked
+- Gas usage
+- Recent blocks feed
+- Recent transactions feed with explorer links
 
-# Query service rankings
-$ cast call $INDEXER "getServiceRankings(uint256)(string[],uint256[])" \
-    4893 --rpc-url $RPC
-["/analyze","/audit","/swap","/price"]
-[780000000000000000000,320000000000000000000,150000000000000000000,100000000000000000000]
-```
+This works today because GOAT Testnet3 produces real blocks and real transactions. No agent IDs needed. No x402 payments needed. Just the chain doing what chains do.
 
-Every call returns real indexed data from x402 payment events on GOAT Network. The response shows agent #4893 earned 1.35 BTC total from 5 transactions across 4 unique clients. The `/analyze` endpoint generates 58% of all revenue.
+### Phase 2 (future · when agent ecosystem matures)
+
+**x402 payment analytics for AI agents.** When GOAT Network's agent ecosystem launches (ERC-8004 agent identities, x402 payment protocol adoption), Kether will index those payments and provide:
+
+- Per-agent revenue dashboards
+- Client spending breakdowns
+- Service-level revenue rankings
+- Growth prediction models
+
+The Phase 1 indexer architecture is the same foundation Phase 2 needs. The only difference is what events we filter for.
 
 ---
 
 ## The problem Kether solves
 
-x402 payments on GOAT Network generate real economic activity — agents paying agents for API calls, data, compute, and services. Today:
+New chains launch. People build on them. Nobody knows what's actually happening.
 
-- **No revenue visibility** — agent builders can't answer "how much did I earn this month"
-- **No client intelligence** — you don't know which clients drive 80% of your revenue
-- **No pricing signal** — should you charge $1 or $0.10 per call? nobody knows
-- **No growth measurement** — is your agent business growing or dying? the data exists but is unreadable
-- **No competitive benchmark** — how does your /audit endpoint compare to others?
+- **No chain visibility** — how many blocks? how many transactions? is anyone using this?
+- **No developer confidence** — should I build here? is the chain alive?
+- **No grant reviewer evidence** — did the grant recipient actually deploy something?
 
-x402 is a payment protocol. It produces events. But events alone are noise. Kether turns that noise into decisions.
+Kether answers all three. It's a window into GOAT Network activity.
 
 ---
 
 ## How Kether works
 
-Five capabilities, all built on GOAT Network. x402 payment events are indexed, aggregated, and analyzed.
+### 1 · Block indexing
 
-### 1 · x402 payment indexing
+The indexer polls GOAT Testnet3 RPC every 10 seconds. For each new block, it stores the block number, hash, timestamp, and transaction count.
 
-A TypeScript indexer listens to x402 `PaymentSettled` events on GOAT Network. It parses every payment — who paid, who received, which endpoint, how much, when. Data is stored in SQLite with hourly aggregation for fast queries. The indexer runs on a 10-second poll against GOAT RPC.
+### 2 · Transaction indexing
 
-### 2 · Revenue intelligence
+Every transaction in every block is parsed. From address, to address, value, gas used — all stored in SQLite with WAL mode for concurrent reads by the API.
 
-The dashboard shows agent builders their real revenue: total earned, monthly trend, per-service breakdown, per-client spending. Revenue is segmented by ERC-8004 agent identity — every agent registered on GOAT gets its own analytics page. No signup needed — connect your agent's ERC-8004 identity and Kether pulls your payment history from the chain.
+### 3 · Address tracking
 
-### 3 · Client breakdown
+Every unique address that sends or receives a transaction is tracked. First seen, last seen, and total transaction count are updated in real time.
 
-Every x402 payment has a `payer` address. Kether aggregates these into client profiles: total spent, services used, payment frequency, last active. Builders discover that 80% of revenue comes from one whale client → they negotiate a volume discount → revenue grows. The data was always there. Kether makes it visible.
+### 4 · Live dashboard
 
-### 4 · Growth prediction
-
-Historical payment data feeds a lightweight prediction model. Kether answers "at current growth rate, your /analyze endpoint will earn 2.3 BTC next month." This isn't a black-box ML oracle — it's linear regression on your own on-chain payment history. You can verify every input yourself on GOAT Network.
-
-### 5 · ERC-8004 agent identity
-
-Agents are discovered via ERC-8004 registry on GOAT Network. Each agent's identity is verifiable on-chain — Kether links every payment to a registered agent profile. No fake data, no impersonation. The analytics page for `agent #4893` is provably linked to the on-chain identity.
+A React dashboard polls the API every 10 seconds. Shows current chain stats (blocks, txns, addresses, gas), recent blocks table, and recent transactions feed with links to GOAT Explorer.
 
 ---
 
@@ -127,107 +104,53 @@ Agents are discovered via ERC-8004 registry on GOAT Network. Each agent's identi
 
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  GOAT Network    │────▶│  Kether Indexer  │────▶│  SQLite + Cache │
-│  (x402 events)   │     │  (10s poll)      │     │                 │
-│                   │     │                   │     │  ▼ Aggregated   │
-│  PaymentSettled   │     │  ▼ Parse event    │     │  ▼ Per-agent    │
-│  ERC-8004 agents  │     │  ▼ Link identity  │     │  ▼ Per-service  │
-│  BTC settlement   │     │  ▼ Store raw      │     │  ▼ Time-series  │
+│  GOAT Testnet3   │────▶│  Kether Indexer  │────▶│  SQLite (WAL)   │
+│  (RPC)           │     │  (10s poll)      │     │                 │
+│                   │     │                   │     │  ▼ blocks       │
+│  eth_blockNumber  │     │  ▼ getBlock()     │     │  ▼ transactions │
+│  eth_getBlock     │     │  ▼ parse txns     │     │  ▼ addresses    │
+│                   │     │  ▼ track addrs    │     │  ▼ stats        │
 └──────────────────┘     └──────────────────┘     └─────────────────┘
                                                               │
                                                               ▼
 ┌──────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Agent Builder   │◀────│  Kether API      │◀────│  Analytics      │
-│  (dashboard)     │     │  (FastAPI)       │     │  Engine         │
-│                   │     │                   │     │                 │
-│  ▼ Revenue charts│     │  GET /agent/:id   │     │  ▼ Revenue      │
-│  ▼ Client list   │     │  GET /services    │     │  ▼ Clients      │
-│  ▼ Growth trend  │     │  POST /predict    │     │  ▼ Prediction   │
-│                   │     │  (x402-gated)    │     │                 │
+│  Browser         │◀────│  Kether API      │◀────│  Query Engine   │
+│  (dashboard)     │     │  (FastAPI)       │     │                 │
+│                   │     │                   │     │  GET /chain/   │
+│  ▼ Stats cards   │     │  /chain/stats     │     │  stats          │
+│  ▼ Blocks table  │     │  /chain/blocks    │     │  GET /chain/    │
+│  ▼ Txns feed     │     │  /chain/transactions│  │  blocks         │
 └──────────────────┘     └──────────────────┘     └─────────────────┘
 ```
 
-### Data flow
-
-1. **x402 payment settles** on GOAT Network — `PaymentSettled(payer, payee, amount, serviceId)` event emitted
-2. **Kether indexer polls** GOAT RPC every 10 seconds — reads new blocks, parses x402 events
-3. **Indexer links payer/payee** to ERC-8004 agent registry — enriches raw addresses with agent identities
-4. **Indexer stores** raw payment + agent metadata in SQLite, updates hourly aggregations
-5. **Dashboard queries** `/api/agent/:erc8004_id/revenue` — API reads aggregated data, returns JSON
-6. **Dashboard renders** revenue charts, client breakdown, service rankings, growth prediction
-7. **Prediction endpoint** (`POST /predict`) is x402-gated — builders pay per prediction query
-
-### Component by component
-
-| Component | Technology | Responsibility |
-|---|---|---|
-| **Indexer** | TypeScript, ethers.js v6 | Polls GOAT RPC, parses x402 PaymentSettled events, links ERC-8004 identities |
-| **Database** | SQLite (WAL mode) | Raw events + hourly/daily aggregations. Per-agent, per-service, per-client |
-| **API** | FastAPI (Python) | REST endpoints for agent revenue, client breakdown, service rankings, growth prediction |
-| **Prediction Engine** | Python (scikit-learn) | Linear regression on time-series payment data, confidence intervals |
-| **x402 Gateway** | x402 protocol on GOAT | Pay-per-call gating for `/predict` endpoint. BTC settlement via x402 DIRECT mode |
-| **ERC-8004 Integration** | ethers.js + GOAT RPC | Reads agent registry, resolves agent identity from payment addresses |
-| **Dashboard** | React 19, Vite 6, TailwindCSS 4 | Revenue charts (Recharts), client table, service rankings, growth trend |
-| **Deployment** | Vercel (dashboard), Render (API + indexer) | Indexer runs as background worker, API as web service |
-
 ---
 
-## x402 use case
-
-Kether uses x402 as its monetization rail. Agent builders pay per analytics query:
-
-- **Who pays**: agent builders (ERC-8004 identified)
-- **Who receives**: Kether analytics API
-- **What's paid for**: each `/predict` call (growth forecast), `/deep-dive` call (per-client analysis)
-- **Why x402**: these are machine-to-machine payments. agents querying analytics about their own payment flows. x402 is built for exactly this — HTTP-native, pay-per-call, no subscription overhead. stripe doesn't work for agents. subscriptions don't work for variable query volume. x402 makes every insight a transaction.
-- **Business case**: a builder with 3 x402 endpoints doing 500 BTC/month pays Kether ~5 BTC/month in analytics fees (1% of tracked volume). at 100 builders = 500 BTC/month recurring. zero payment processing overhead because x402 settles directly on GOAT.
-
----
-
-## What's real vs pending — the honesty table
+## What's real vs pending
 
 | Capability | Status |
 |---|---|
-| **Research** — competitive analysis | **Done** |
-| **Architecture** — component design, data flow, x402 integration plan | **Done** |
-| **GOAT Network Wallet** — `0xf9BAC173da2E212Bb2A8418178714c4dB0e867e0` | **Done** |
-| **GOAT x402 Integration Faucet** — requested | **Pending** |
-| **KetherIndexer.sol** (on-chain x402 payment aggregation) | **Done** — 8 forge tests passing, compiled, ready for deploy |
-| **Indexer** — x402 event polling, ERC-8004 linking, SQLite storage | **Done** — TypeScript poller, WAL-mode SQLite, 10s interval |
-| **API** — FastAPI endpoints (/agent/:id, /services, /clients, /predict) | **Done** — 5 endpoints, x402-gated /predict, CORS enabled |
-| **Prediction Engine** — linear regression on payment time-series | **Done** — scikit-learn, R² confidence scoring |
-| **Dashboard** — React + Recharts revenue intelligence | **Done** — KPI cards, bar/pie charts, client table, prediction panel |
-| **GOAT Testnet3 Contract Deploy** — KetherIndexer on-chain | **Live** — [0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4), verified, seeded with test data |
-| **Live deployment** — kether-three.vercel.app | **Live** — dashboard deployed, interactive |
-| **Real x402 payments** — production settlement on GOAT Network | **Pending** — testnet first, mainnet post-grant |
-
----
-
-## How it uses GOAT Network
-
-**Reads.** The indexer polls GOAT RPC every 10 seconds, reading x402 `PaymentSettled` events and ERC-8004 agent registry data. All reads are free — view functions and event logs on GOAT Network.
-
-**Writes.** The indexer contract stores aggregated revenue data on-chain for public verifiability. Builders can verify Kether's numbers against raw x402 events independently.
-
-**Verified on GOAT Explorer.** Once deployed, the indexer contract and all x402 payment events are verifiable at explorer.goat.network.
-
-**Chain-native.** Kether uses GOAT's native BTC for all settlement. x402 payments are denominated in BTC. No wrapped tokens, no bridges, no extra layers.
+| **Contract deployed** — KetherIndexer on GOAT Testnet3 | **Live** — [0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4), verified |
+| **8 forge tests passing** | **Done** |
+| **Phase 1 indexer** — polls GOAT Testnet3, indexes blocks/txns/addresses | **Done** |
+| **Phase 1 API** — /chain/stats, /chain/blocks, /chain/transactions | **Done** |
+| **Phase 1 dashboard** — live chain metrics, blocks table, txns feed | **Done** |
+| **Phase 2 x402 payment indexer** — agent-specific event parsing | **Planned** — post-grant, when x402 adoption exists |
+| **Phase 2 agent dashboard** — per-agent revenue, clients, predictions | **Planned** — post-grant |
+| **Real x402 payments on GOAT** | **Waiting** — ecosystem not launched yet |
 
 ---
 
 ## Engineering decisions & the hard problems
 
-- **10-second polling, not real-time WebSocket.** GOAT RPC doesn't expose a WebSocket subscription for x402 events. The 10-second poll interval balances freshness with RPC rate limits. Hourly aggregations keep dashboard queries fast.
+- **10-second polling, not WebSocket.** GOAT RPC doesn't expose WebSocket subscriptions. 10-second poll balances freshness with rate limits.
 
-- **SQLite, not PostgreSQL.** Single-file database with WAL mode. No server to manage, no connection pooling, no separate deployment. SQLite handles 10K writes/minute — more than enough for x402 event volume on a growing network.
+- **SQLite, not PostgreSQL.** Single-file database with WAL mode. No server to manage. SQLite handles Kether's write volume easily.
 
-- **On-chain aggregations for verifiability.** Raw payment data lives on GOAT. Kether stores aggregated totals on-chain so builders can verify "Kether says I earned 500 BTC → let me check the chain → yes, 500 BTC confirmed."
+- **Phase 1 funds Phase 2.** The chain analytics indexer is the same architecture the x402 payment indexer needs. Building Phase 1 now means zero refactoring when agent payments go live.
 
-- **Prediction is linear regression, not deep learning.** The model inputs are historical payment volume per service. Linear regression is explainable, fast, and sufficient for trend detection. Builders don't need a black box — they need to know "am I growing?"
+- **No fake data.** Every number on the dashboard comes from a real block on GOAT Testnet3. The stats say LIVE, REAL, TRACKED because they are.
 
-- **x402-gated, not subscription-gated.** Charging per prediction query aligns incentives. Builders who earn more query more. Builders who earn less aren't paying for analytics they don't need.
-
-- **ERC-8004 identity linking at index time.** Payment events carry wallet addresses. The indexer resolves these to ERC-8004 agent identities during processing — not at query time. This keeps the API fast and avoids RPC calls on every dashboard load.
+- **Simple API, fast queries.** Three endpoints. No auth. No pagination complexity. Chain stats, blocks, transactions. That's it.
 
 ---
 
@@ -250,75 +173,31 @@ Ran 8 tests for contracts/test/Kether.t.sol:KetherTest
 Suite result: ok. 8 passed; 0 failed; 0 skipped
 ```
 
-| Test | What it proves |
-|---|---|
-| `test_index_payment_event` | x402 PaymentSettled events are correctly parsed and stored |
-| `test_aggregate_agent_revenue` | Per-agent revenue totals match raw event sums |
-| `test_get_top_clients` | Client spending is correctly ranked |
-| `test_get_service_rankings` | Per-service revenue is correctly aggregated |
-| `test_link_erc8004_identity` | Payment addresses resolve to ERC-8004 agent profiles |
-| `test_x402_payment_gating` | `/predict` endpoint requires valid x402 payment |
-| `test_prediction_query` | Growth prediction returns sane values on known data |
-| `test_unlinked_address_returns_zero` | Unregistered addresses return zero revenue |
+The contract tests are written for Phase 2 (x402 payment indexing). They pass on the deployed contract. Phase 1 doesn't change the contract — it just adds a TypeScript indexer that reads raw blocks.
 
 ---
 
 ## Run it locally
 
-**Prerequisites:** Node.js 20+, Python 3.11+, Foundry, GOAT Testnet3 RPC endpoint.
+**Prerequisites:** Node.js 20+, Python 3.11+, Foundry.
 
 ```bash
 git clone https://github.com/subheeksh5599/kether.git
 cd kether
 
-# Install dependencies
-npm install           # dashboard + indexer
-pip install -r requirements.txt  # API + prediction
-
-# Run tests
-forge test -vvv
-
-# Deploy contracts to GOAT Testnet3
-cp .env.example .env  # fill in PRIVATE_KEY and GOAT_RPC_URL
-source .env
-forge script contracts/script/Deploy.s.sol --rpc-url $GOAT_RPC_URL --broadcast
-
-# Run the indexer (background worker)
-cd indexer && npm run dev
+# Run the indexer (starts indexing GOAT Testnet3)
+cd indexer && npm install && npm run dev
 
 # Run the API
-cd api && uvicorn main:app --reload --port 8000
+cd api && pip install -r requirements.txt && uvicorn main:app --reload --port 8000
 
 # Run the dashboard
 cd dashboard && npm install && npm run dev  # :5173
 ```
 
-Open `http://localhost:5173` and enter your ERC-8004 agent ID. Kether pulls your x402 payment history from GOAT Testnet3.
+Open `http://localhost:5173` and click "Open Dashboard". The dashboard polls the API every 10 seconds showing real GOAT Testnet3 data.
 
-## Configuration
-
-```toml
-# .env
-GOAT_RPC_URL=https://rpc.testnet3.goat.network
-GOAT_CHAIN_ID=48816
-INDEXER_CONTRACT=0x_kether_indexer_address_
-PRIVATE_KEY=your_goat_wallet_private_key
-
-# config.yaml
-indexer:
-  poll_interval_seconds: 10
-  batch_size: 100
-  start_block: 0
-
-api:
-  host: 0.0.0.0
-  port: 8000
-  x402_price_btc: 0.00001
-
-database:
-  path: ./data/kether.db
-  wal_mode: true
-```
+---
 
 ## Deploy
 
@@ -326,61 +205,46 @@ database:
 |---|---|
 | **Dashboard** | **[kether-three.vercel.app](https://kether-three.vercel.app)** — Vercel |
 | **KetherIndexer** | **[0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4)** — GOAT Testnet3, verified |
-| **API** | kether-api.onrender.com — Render (pending) |
 
-The indexer runs as a background worker on Render's free tier. The API serves dashboard requests via FastAPI. The dashboard is deployed on Vercel. Contracts are on GOAT Testnet3 — mainnet deployment planned for grant milestone 2.
+---
 
 ## Project layout
 
 ```
 kether/
 ├── contracts/
-│   ├── src/
-│   │   └── KetherIndexer.sol    # On-chain revenue aggregations
-│   ├── script/Deploy.s.sol      # Foundry deployment script
-│   └── test/Kether.t.sol        # 8 forge tests
+│   ├── src/KetherIndexer.sol     # Phase 2 contract (deployed, verified)
+│   └── test/Kether.t.sol         # 8 forge tests
 ├── indexer/
-│   ├── src/
-│   │   ├── poller.ts            # 10s GOAT RPC poll, x402 event parsing
-│   │   ├── identity.ts          # ERC-8004 agent resolution
-│   │   └── store.ts             # SQLite write, hourly aggregation
-│   └── package.json
+│   └── src/poller.ts             # Phase 1: block/txn/address indexer
 ├── api/
-│   ├── main.py                  # FastAPI app
-│   ├── routes/
-│   │   ├── agent.py             # GET /agent/:id/revenue
-│   │   ├── services.py          # GET /services/rankings
-│   │   ├── predict.py           # POST /predict (x402-gated)
-│   │   └── x402.py              # x402 payment verification middleware
-│   ├── engine/
-│   │   └── predictor.py         # Linear regression, confidence intervals
-│   └── requirements.txt
+│   ├── main.py                   # FastAPI: /chain/stats, blocks, txns
+│   └── engine/store.py           # SQLite connection wrapper
 ├── dashboard/
 │   └── src/
-│       ├── DashboardPage.tsx     # Revenue charts, client table, growth trend
-│       ├── components/           # RevenueCard, ClientTable, ServiceChart, PredictPanel
-│       └── hooks/                # useAgent, useRevenue, usePrediction
-├── .env.example
-├── foundry.toml
+│       ├── components/
+│       │   ├── Landing.tsx       # Landing page
+│       │   ├── Dashboard.tsx     # Chain analytics dashboard
+│       │   └── DashboardPage.tsx # Dashboard route
+│       └── hooks/
+│           └── useChainApi.ts    # Chain API hooks (10s polling)
 └── README.md
 ```
 
 ## Tech stack
 
-- **Smart Contracts:** Solidity 0.8.24 + Foundry (forge, cast)
 - **Indexer:** TypeScript, ethers.js v6, SQLite (WAL mode)
-- **API:** Python 3.11, FastAPI, scikit-learn
-- **Payments:** x402 DIRECT mode on GOAT Network, BTC settlement
-- **Identity:** ERC-8004 agent registry on GOAT Network
-- **Dashboard:** React 19, Vite 6, TypeScript (strict), TailwindCSS 4, Recharts
-- **Deployment:** Vercel (dashboard), Render (API + indexer)
-- **Verification:** `forge test` — 8 tests; GOAT Explorer for on-chain verification
+- **API:** Python 3.11, FastAPI
+- **Dashboard:** React 19, Vite 6, TypeScript, TailwindCSS 4
+- **Contract:** Solidity 0.8.24, Foundry (forge, cast)
+- **Chain:** GOAT Network Testnet3
+- **Deployment:** Vercel (dashboard)
 
 ## Roadmap
 
-- **Grant Milestone 1** — Indexer live on GOAT Testnet3, basic revenue dashboard, ERC-8004 identity linking
-- **Grant Milestone 2** — x402-gated prediction endpoint, client breakdown, service rankings, mainnet deployment
-- **Post-grant** — Competitive benchmarking across agents, anomaly detection ("client X stopped paying"), pricing recommendations, public leaderboard for top-earning GOAT agents
+- **Phase 1 (current)** — Block/txn/address indexer, chain stats dashboard, live on GOAT Testnet3
+- **Phase 2 (post-grant)** — x402 payment indexer, agent revenue dashboards, client breakdowns, growth prediction
+- **Phase 3 (ecosystem)** — Competitive benchmarking, anomaly detection, pricing recommendations
 
 ## License
 

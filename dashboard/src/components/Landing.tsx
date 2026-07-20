@@ -170,7 +170,7 @@ export default function Landing() {
         <div className="nav-inner">
           <Link to="/" className="nav-logo">KETH<span>ER</span></Link>
           <div className="nav-center">
-            <a href="#products">Products</a>
+            <a href="#products">Projects</a>
             <a href="#ecosystem">Ecosystem</a>
             <a href="#docs">Docs</a>
             <a href="#blog">Blog</a>
@@ -187,19 +187,19 @@ export default function Landing() {
         <div className="wrap">
           <div className="hero-grid">
             <div className="hero-left">
-              <div className="upper" style={{ marginBottom: "0.5rem" }}>GOAT AI Builder Grants ($500) · x402 Payment Analytics</div>
+              <div className="upper" style={{ marginBottom: "0.5rem" }}>GOAT AI Builder Grants ($500) · Real-Time Chain Analytics</div>
               <h1 className="pixel glitch-h1">
-                <span>AGENTS</span>{" "}
-                <span>PAY. WE</span>{" "}
-                <span>INDEX.</span>
+                <span>GOAT</span>{" "}
+                <span>NETWORK</span>{" "}
+                <span>ANALYTICS</span>
               </h1>
               <p style={{ fontSize: "0.75rem", color: "var(--muted)", maxWidth: "400px", marginTop: "1.5rem" }}>
-                Built for the GOAT AI Builder Grants Program ($500 base grant). Every x402 payment on GOAT Network, indexed and analyzed. Revenue intelligence, client breakdowns, and growth prediction for AI agent builders.
+                Phase 1: index every block and transaction on GOAT Testnet3. Real-time chain metrics — blocks, transactions, active addresses, gas usage. Phase 2: x402 payment analytics when the agent ecosystem matures.
               </p>
               <div className="hero-stats">
-                <div className="stat-tile"><div className="upper">Payments Indexed</div><div className="stat-val">12,470+</div></div>
-                <div className="stat-tile"><div className="upper">Agents Tracked</div><div className="stat-val">847</div></div>
-                <div className="stat-tile"><div className="upper">Endpoints Monitored</div><div className="stat-val">3,102+</div></div>
+                <div className="stat-tile"><div className="upper">Blocks Indexed</div><div className="stat-val">LIVE</div></div>
+                <div className="stat-tile"><div className="upper">Transactions</div><div className="stat-val">REAL</div></div>
+                <div className="stat-tile"><div className="upper">Active Addresses</div><div className="stat-val">TRACKED</div></div>
               </div>
             </div>
             <div className="hero-right">
@@ -215,10 +215,10 @@ export default function Landing() {
         <div className="wrap">
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
             <div>
-              <div className="upper" style={{ marginBottom: "0.3rem" }}>Built for GOAT AI Builder Grants · $500 Base Grant</div>
-              <h2 className="pixel" style={{ fontSize: "clamp(2rem,5vw,4.5rem)" }}>WHAT WE BUILD</h2>
+              <div className="upper" style={{ marginBottom: "0.3rem" }}>Phase 1: GOAT Testnet3 Chain Analytics · Phase 2: x402 Payments</div>
+              <h2 className="pixel" style={{ fontSize: "clamp(2rem,5vw,4.5rem)" }}>PROJECTS</h2>
             </div>
-            <div className="tag">LIVE ON TESTNET</div>
+            <div className="tag">PHASE 1 · LIVE</div>
           </div>
 
           <div className="filter-bar">
@@ -254,10 +254,10 @@ export default function Landing() {
         <div className="wrap">
           <div className="upper" style={{ marginBottom: "0.5rem" }}>GOAT AI Builder Grants Program · $500 Base Grant</div>
           <h2 className="pixel" style={{ fontSize: "clamp(2rem,5vw,4.5rem)", marginBottom: "1rem" }}>
-            READY TO INDEX<br />YOUR AGENTS?
+            READY TO EXPLORE<br />GOAT NETWORK?
           </h2>
           <p style={{ fontSize: "0.75rem", color: "var(--muted)", maxWidth: "500px", margin: "0 auto 1rem" }}>
-            Connect your ERC-8004 agent identity. Kether pulls your x402 payment history from GOAT Network. No signup, no API keys — just your agent ID.
+            Phase 1 is live — every block, every transaction, every address on GOAT Testnet3, indexed in real time. Phase 2 ships x402 payment analytics when the agent ecosystem goes live.
           </p>
           <div className="cta-buttons">
             <Link to="/dashboard" className="btn btn-solid">OPEN DASHBOARD</Link>
