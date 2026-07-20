@@ -42,6 +42,22 @@ export default function Dashboard() {
           <div className="tag">{statsLoading ? "SYNCING..." : `BLOCK #${stats?.last_block?.toLocaleString() || "..."}`}</div>
         </div>
 
+        {/* Data disclaimer */}
+        <div style={{
+          border: "1px solid var(--border)", background: "var(--card-bg)",
+          padding: "0.75rem 1rem", marginBottom: "1.5rem",
+          fontFamily: "'Space Mono', monospace", fontSize: "0.6rem",
+          color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em",
+          lineHeight: 1.6
+        }}>
+          ⚠ STATIC SNAPSHOT — this is a one-time seed of {stats?.total_blocks?.toLocaleString() || "..."} real GOAT Testnet3 blocks indexed on july 20 2026.
+          data is frozen and does not update. transactions and addresses are real on-chain data, verifiable on{" "}
+          <a href="https://explorer.testnet3.goat.network" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", textDecoration: "underline" }}>
+            GOAT Explorer
+          </a>.
+          a live indexer requires 24/7 polling infrastructure — planned for phase 2.
+        </div>
+
         {/* KPI Cards */}
         <div className="kpi-grid">
           <KpiCard label="Blocks Indexed" value={statsLoading ? "..." : (stats?.total_blocks?.toLocaleString() || "0")} />

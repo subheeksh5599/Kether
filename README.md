@@ -125,18 +125,22 @@ A React dashboard polls the API every 10 seconds. Shows current chain stats (blo
 
 ---
 
-## What's real vs pending
+## What's real vs pending — the honesty table
 
-| Capability | Status |
-|---|---|
-| **Contract deployed** — KetherIndexer on GOAT Testnet3 | **Live** — [0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4), verified |
-| **8 forge tests passing** | **Done** |
-| **Phase 1 indexer** — polls GOAT Testnet3, indexes blocks/txns/addresses | **Done** |
-| **Phase 1 API** — /chain/stats, /chain/blocks, /chain/transactions | **Done** |
-| **Phase 1 dashboard** — live chain metrics, blocks table, txns feed | **Done** |
-| **Phase 2 x402 payment indexer** — agent-specific event parsing | **Planned** — post-grant, when x402 adoption exists |
-| **Phase 2 agent dashboard** — per-agent revenue, clients, predictions | **Planned** — post-grant |
-| **Real x402 payments on GOAT** | **Waiting** — ecosystem not launched yet |
+| Claim | Reality | Status |
+|---|---|---|
+| **Contract deployed** | KetherIndexer.sol on GOAT Testnet3 at [0x8248b2...](https://explorer.testnet3.goat.network/address/0x8248b253033400a59C751F9c2D3BCCAc5428f6D4). Verified on explorer. | ✅ Live |
+| **8 forge tests passing** | `forge test -vvv` — 8/8 pass. Tests cover indexing, aggregation, ranking, identity linking, x402 gating, prediction. | ✅ Done |
+| **300 real GOAT Testnet3 blocks indexed** | One-shot seed script fetched blocks 15277001–15277300 from GOAT RPC. 31 real transactions. 8 unique addresses. Every number verifiable on GOAT Explorer. | ✅ One-time snapshot |
+| **Dashboard shows real data** | KPI cards, blocks table, transactions feed — all populated from the seed data. Dashboard reads static JSON, no backend required. | ✅ Live on Vercel |
+| **Indexer code works** | TypeScript poller correctly fetches blocks, resolves tx hashes (GOAT RPC only returns hashes, not full objects), tracks addresses. Tested with real GOAT Testnet3 RPC. | ✅ Code done |
+| **Live indexer (24/7 polling)** | Indexer code exists and works but is NOT running continuously. Requires a server with Node.js + ethers. Current deployment uses a static JSON snapshot. | ❌ Not deployed |
+| **Live API (FastAPI)** | API code exists but is NOT deployed. Dashboard reads static JSON from Vercel instead. No backend needed for current demo. | ❌ Not deployed |
+| **Real-time updates** | Data is frozen at block 15277300 (July 20, 2026). Dashboard does not show new blocks or transactions. | ❌ Static snapshot |
+| **x402 payment indexing** | No x402 payments exist on GOAT yet. The contract supports it (tested in forge), the indexer pattern is proven. Waiting for agent ecosystem to launch. | ⏳ Phase 2 |
+| **Agent revenue dashboards** | Code was written for Phase 2 (per-agent revenue, client breakdown, predictions). Removed from dashboard to be honest — no agents to analyze yet. | ⏳ Phase 2 |
+| **x402 integration faucet** | Requested from GOAT. No response yet. Not required for Phase 1. | ⏳ Pending |
+| **Real user traffic** | None. This is a grant demo, not a product with users. | ❌ None |
 
 ---
 
